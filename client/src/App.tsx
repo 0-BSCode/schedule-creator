@@ -28,6 +28,7 @@ import { AddIcon, ChevronLeftIcon, ChevronRightIcon } from "@chakra-ui/icons";
 import { UserCoursesContext } from "./context/userCoursesContext";
 import StudentCoursesTable from "./components/StudentCoursesTable";
 import CourseInterface from "./types/interfaces/course-interface";
+import useScheduleHelper from "./hooks/useScheduleHelper";
 
 const getCurrentYear = (): number => {
   return new Date().getFullYear();
@@ -50,6 +51,7 @@ function App() {
   const [period, setPeriod] = useState(AcademicPeriodEnum.FIRST_SEMESTER);
   const [page, setPage] = useState(1);
   const { courses, totalPages, getCourses } = useCourse();
+  const { isCourseClashing } = useScheduleHelper();
   const { courses: studentCourses, setCourses } =
     useContext(UserCoursesContext);
 
@@ -183,7 +185,8 @@ function App() {
                             course.enrolledStudents === course.totalStudents ||
                             !!studentCourses.filter(
                               (sc) => sc.code === course.code
-                            ).length
+                            ).length ||
+                            isCourseClashing(course, studentCourses)
                           }
                         />
                       </Td>
