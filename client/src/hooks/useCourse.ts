@@ -28,17 +28,19 @@ export interface PayloadInterface {
 
 interface UseCourseHookInterface {
   courses: CourseInterface[];
+  totalPages: number;
   getCourses: (payload: PayloadInterface) => Promise<CourseInterface[]>;
 }
 
 const useCourse = (): UseCourseHookInterface => {
   const [courses, setCourses] = useState<CourseInterface[]>([]);
-  const [pageNum, setPageNum] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
   const getCourses = async (
     payload: PayloadInterface
   ): Promise<CourseInterface[]> => {
     const data = await fetchCourses(payload);
+    setTotalPages(data.totalPages);
     const courseData = parseCourses(data);
     setCourses(courseData);
     return courseData;
@@ -73,6 +75,7 @@ const useCourse = (): UseCourseHookInterface => {
 
   return {
     courses,
+    totalPages,
     getCourses,
   };
 };

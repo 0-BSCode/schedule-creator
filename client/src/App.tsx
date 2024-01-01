@@ -46,18 +46,23 @@ function App() {
   const [year, setYear] = useState(2023);
   const [period, setPeriod] = useState(AcademicPeriodEnum.FIRST_SEMESTER);
   const [page, setPage] = useState(1);
-  const { courses, getCourses } = useCourse();
+  const { courses, totalPages, getCourses } = useCourse();
 
   async function handleFetch(
     e?: React.FormEvent<HTMLButtonElement>,
     pageNum?: number
   ): Promise<void> {
-    e?.preventDefault();
+    let pageNumber = pageNum ?? page;
+    if (e) {
+      e.preventDefault();
+      pageNumber = 1;
+      setPage(1);
+    }
     const payload: PayloadInterface = {
       course,
       period,
       year,
-      page: pageNum ?? page,
+      page: pageNumber,
     };
     getCourses(payload);
   }
@@ -192,7 +197,7 @@ function App() {
                 }}
                 disabled={page === 1}
               />
-              <Text size="md">Page {page}</Text>
+              <Text size="md">Page {page} of {totalPages}</Text>
               <IconButton
                 aria-label="Go forward"
                 icon={<ChevronRightIcon />}
