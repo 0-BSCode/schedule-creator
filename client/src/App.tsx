@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import "./App.css";
 import AcademicPeriodEnum from "./types/enums/academic-period-enum";
 import {
@@ -25,6 +25,9 @@ import {
   TableContainer,
 } from "@chakra-ui/react";
 import { AddIcon, ChevronLeftIcon, ChevronRightIcon } from "@chakra-ui/icons";
+import { UserCoursesContext } from "./context/userCoursesContext";
+import StudentCoursesTable from "./components/StudentCoursesTable";
+import CourseInterface from "./types/interfaces/course-interface";
 
 const getCurrentYear = (): number => {
   return new Date().getFullYear();
@@ -47,6 +50,8 @@ function App() {
   const [period, setPeriod] = useState(AcademicPeriodEnum.FIRST_SEMESTER);
   const [page, setPage] = useState(1);
   const { courses, totalPages, getCourses } = useCourse();
+  const { courses: studentCourses, setCourses } =
+    useContext(UserCoursesContext);
 
   async function handleFetch(
     e?: React.FormEvent<HTMLButtonElement>,
@@ -92,9 +97,13 @@ function App() {
     }
   }
 
+  function addCourse(course: CourseInterface): void {
+    setCourses([...studentCourses, course]);
+  }
+
   return (
     <HStack alignItems={"flex-start"} h="100vh">
-      <Stack p={3} maxW={"60%"} h={"100%"}>
+      <Stack p={3} maxW={"50%"} h={"100%"}>
         <Stack>
           <HStack spacing={6} alignItems={"center"}>
             <FormControl>
@@ -167,9 +176,16 @@ function App() {
                           aria-label="Add course"
                           icon={<AddIcon />}
                           colorScheme="green"
-                        >
-                          Add
-                        </IconButton>
+                          onClick={() => {
+                            addCourse(course);
+                          }}
+                          isDisabled={
+                            course.enrolledStudents === course.totalStudents ||
+                            !!studentCourses.filter(
+                              (sc) => sc.code === course.code
+                            ).length
+                          }
+                        />
                       </Td>
                       <Td>
                         <Tooltip label={course.description}>
@@ -207,7 +223,7 @@ function App() {
                 onClick={(e) => {
                   handlePageChange(PageDirectionEnum.BACK);
                 }}
-                disabled={page === 1}
+                isDisabled={page === 1}
               />
               <Text size="md">
                 Page {page} of {totalPages}
@@ -223,7 +239,7 @@ function App() {
           </Box>
         )}
       </Stack>
-      <Box>Schedule</Box>
+      <StudentCoursesTable />
     </HStack>
   );
 }
