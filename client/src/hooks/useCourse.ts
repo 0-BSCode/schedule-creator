@@ -54,15 +54,17 @@ const useCourse = (): UseCourseHookInterface => {
   const parseCourses = (rawData: ResponseInterface): CourseInterface[] => {
     const newCourses: CourseInterface[] = rawData.courses.map((course) => {
       const studentInfo = course.enrolledStudents.split("/");
-      const courseInfo = {
+      const courseInfo = course.code.split(" - ");
+
+      return {
         ...course,
+        code: courseInfo[0],
+        group: parseInt(courseInfo[1][courseInfo[1].length - 1]),
         professors: [course.professors],
         schedule: [course.schedule],
         enrolledStudents: parseInt(studentInfo[0]),
         totalStudents: parseInt(studentInfo[1]),
       };
-
-      return courseInfo;
     });
     return newCourses;
   };

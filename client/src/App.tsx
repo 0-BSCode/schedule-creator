@@ -109,6 +109,7 @@ function App() {
           <pre key={`course-${idx}`}>{JSON.stringify(course, null, 2)}</pre>
         ))}
       </Stack>
+      <Box w="25rem">Schedule</Box>
     </Flex>
   );
 }
