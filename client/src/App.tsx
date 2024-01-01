@@ -1,10 +1,18 @@
 import { useState } from "react";
 import "./App.css";
-import axios from "axios";
 import AcademicPeriodEnum from "./types/enums/academic-period-enum";
-import { Box, Button, Flex, HStack, Input, Select } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  Flex,
+  HStack,
+  Input,
+  Select,
+  Stack,
+} from "@chakra-ui/react";
 import NumberInput from "./components/NumberInput";
-import { FormControl, FormLabel, FormHelperText } from "@chakra-ui/react";
+import { FormControl, FormLabel } from "@chakra-ui/react";
+import useCourse, { PayloadInterface } from "./hooks/useCourse";
 
 const getCurrentYear = (): number => {
   return new Date().getFullYear();
@@ -20,19 +28,22 @@ function App() {
   const [course, setCourse] = useState("");
   const [year, setYear] = useState(2023);
   const [period, setPeriod] = useState(AcademicPeriodEnum.FIRST_SEMESTER);
+  const [page, setPage] = useState(1);
+  const [data, setData] = useState("");
+  const { courses, getCourses } = useCourse();
 
   async function handleFetch(
     e: React.FormEvent<HTMLButtonElement>
   ): Promise<void> {
     e.preventDefault();
-    const payload = {
+    const payload: PayloadInterface = {
       course,
-      academicPeriod: AcademicPeriodEnum.SECOND_SEMESTER,
+      period,
       year,
-      page: 1,
+      page,
     };
-    const res = await axios.post("http://localhost:3000/courses", payload);
-    console.log(res.data);
+    const courses = getCourses(payload);
+    setData(JSON.stringify(courses));
   }
 
   function handleCourseChange(e: React.ChangeEvent<HTMLInputElement>): void {
@@ -54,58 +65,50 @@ function App() {
   return (
     <Flex>
       <Box w="15rem">Sidebar</Box>
-      <HStack p={3} spacing={6} alignItems={"center"}>
-        <FormControl>
-          <FormLabel>Course Code</FormLabel>
-          <Input
-            placeholder="CIS 2106"
-            value={course}
-            onChange={handleCourseChange}
-          />
-          <FormHelperText>
-            Code of the course you're looking for.
-          </FormHelperText>
-        </FormControl>
-        <FormControl>
-          <FormLabel>Academic Period</FormLabel>
-          <Select value={period} onChange={handlePeriodChange}>
-            {Object.keys(academicPeriodLabelToEnum).map((label) => (
-              <option
-                key={label}
-                value={
-                  academicPeriodLabelToEnum[
-                    label as keyof typeof academicPeriodLabelToEnum
-                  ]
-                }
-              >
-                {label}
-              </option>
-            ))}
-          </Select>
-          <FormHelperText>Academic period you're looking in.</FormHelperText>
-        </FormControl>
-        <FormControl>
-          <FormLabel>Academic Year</FormLabel>
-          <NumberInput
-            value={year}
-            onChange={handleYearChange}
-            max={getCurrentYear()}
-            min={2017}
-            defaultValue={getCurrentYear()}
-          />
-          <FormHelperText>Academic year you're looking in.</FormHelperText>
-        </FormControl>
-      </HStack>
-      <form>
-        <label htmlFor="courseName">Course</label>
-        <input
-          id="courseName"
-          type="text"
-          value={course}
-          onChange={handleCourseChange}
-        />
+      <Stack p={3}>
+        <HStack spacing={6} alignItems={"center"}>
+          <FormControl>
+            <FormLabel>Course Code</FormLabel>
+            <Input
+              placeholder="CIS 2106"
+              value={course}
+              onChange={handleCourseChange}
+            />
+          </FormControl>
+          <FormControl>
+            <FormLabel>Academic Period</FormLabel>
+            <Select value={period} onChange={handlePeriodChange}>
+              {Object.keys(academicPeriodLabelToEnum).map((label) => (
+                <option
+                  key={label}
+                  value={
+                    academicPeriodLabelToEnum[
+                      label as keyof typeof academicPeriodLabelToEnum
+                    ]
+                  }
+                >
+                  {label}
+                </option>
+              ))}
+            </Select>
+          </FormControl>
+          <FormControl>
+            <FormLabel>Academic Year</FormLabel>
+            <NumberInput
+              value={year}
+              onChange={handleYearChange}
+              max={getCurrentYear()}
+              min={2017}
+              defaultValue={getCurrentYear()}
+            />
+          </FormControl>
+        </HStack>
         <Button onClick={handleFetch}>Search</Button>
-      </form>
+        <h2>JSON Data (Stringified):</h2>
+        {courses.map((course, idx) => (
+          <pre key={`course-${idx}`}>{JSON.stringify(course, null, 2)}</pre>
+        ))}
+      </Stack>
     </Flex>
   );
 }
