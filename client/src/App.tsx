@@ -4,13 +4,13 @@ import AcademicPeriodEnum from "./types/enums/academic-period-enum";
 import {
   Box,
   Button,
-  Flex,
   HStack,
   IconButton,
   Input,
   Select,
   Stack,
   Text,
+  Tooltip,
 } from "@chakra-ui/react";
 import NumberInput from "./components/NumberInput";
 import { FormControl, FormLabel } from "@chakra-ui/react";
@@ -24,7 +24,7 @@ import {
   Td,
   TableContainer,
 } from "@chakra-ui/react";
-import { ChevronLeftIcon, ChevronRightIcon } from "@chakra-ui/icons";
+import { AddIcon, ChevronLeftIcon, ChevronRightIcon } from "@chakra-ui/icons";
 
 const getCurrentYear = (): number => {
   return new Date().getFullYear();
@@ -93,53 +93,56 @@ function App() {
   }
 
   return (
-    <Flex>
-      <Box w="20%">Sidebar</Box>
-      <Stack p={3} maxW={"50%"}>
-        <HStack spacing={6} alignItems={"center"}>
-          <FormControl>
-            <FormLabel>Course Code</FormLabel>
-            <Input
-              placeholder="CIS 2106"
-              value={course}
-              onChange={handleCourseChange}
-            />
-          </FormControl>
-          <FormControl>
-            <FormLabel>Academic Period</FormLabel>
-            <Select value={period} onChange={handlePeriodChange}>
-              {Object.keys(academicPeriodLabelToEnum).map((label) => (
-                <option
-                  key={label}
-                  value={
-                    academicPeriodLabelToEnum[
-                      label as keyof typeof academicPeriodLabelToEnum
-                    ]
-                  }
-                >
-                  {label}
-                </option>
-              ))}
-            </Select>
-          </FormControl>
-          <FormControl>
-            <FormLabel>Academic Year</FormLabel>
-            <NumberInput
-              value={year}
-              onChange={handleYearChange}
-              max={getCurrentYear()}
-              min={2017}
-              defaultValue={getCurrentYear()}
-            />
-          </FormControl>
-        </HStack>
-        <Button onClick={handleFetch}>Search</Button>
+    <HStack alignItems={"flex-start"} h="100vh">
+      <Stack p={3} maxW={"60%"} h={"100%"}>
+        <Stack>
+          <HStack spacing={6} alignItems={"center"}>
+            <FormControl>
+              <FormLabel>Course Code</FormLabel>
+              <Input
+                placeholder="CIS 2106"
+                value={course}
+                onChange={handleCourseChange}
+              />
+            </FormControl>
+            <FormControl>
+              <FormLabel>Academic Period</FormLabel>
+              <Select value={period} onChange={handlePeriodChange}>
+                {Object.keys(academicPeriodLabelToEnum).map((label) => (
+                  <option
+                    key={label}
+                    value={
+                      academicPeriodLabelToEnum[
+                        label as keyof typeof academicPeriodLabelToEnum
+                      ]
+                    }
+                  >
+                    {label}
+                  </option>
+                ))}
+              </Select>
+            </FormControl>
+            <FormControl>
+              <FormLabel>Academic Year</FormLabel>
+              <NumberInput
+                value={year}
+                onChange={handleYearChange}
+                max={getCurrentYear()}
+                min={2017}
+                defaultValue={getCurrentYear()}
+              />
+            </FormControl>
+          </HStack>
+          <Button onClick={handleFetch}>Search</Button>
+        </Stack>
         {courses.length === 0 ? (
-          <Text fontSize={"md"} textAlign={'center'} color="gray">Search first to see the data.</Text>
+          <Text fontSize={"md"} textAlign={"center"} color="gray">
+            Search first to see the data.
+          </Text>
         ) : (
           <Box pt={3}>
             <TableContainer
-              maxH={"20rem"}
+              maxH={"25rem"}
               style={{
                 overflow: "auto",
               }}
@@ -149,7 +152,6 @@ function App() {
                   <Tr>
                     <Th></Th>
                     <Th>Code</Th>
-                    <Th>Description</Th>
                     <Th>Status</Th>
                     <Th>Professor/s</Th>
                     <Th>Schedule</Th>
@@ -161,10 +163,19 @@ function App() {
                   {courses.map((course, idx) => (
                     <Tr key={`course-${idx}`}>
                       <Td>
-                        <Button colorScheme="green">Add</Button>
+                        <IconButton
+                          aria-label="Add course"
+                          icon={<AddIcon />}
+                          colorScheme="green"
+                        >
+                          Add
+                        </IconButton>
                       </Td>
-                      <Td>{`${course.code} - ${course.group}`}</Td>
-                      <Td>{course.description}</Td>
+                      <Td>
+                        <Tooltip label={course.description}>
+                          {`${course.code} - G${course.group}`}
+                        </Tooltip>
+                      </Td>
                       <Td>{course.status}</Td>
                       <Td>
                         {course.professors.map((prof, pIdx) => (
@@ -198,7 +209,9 @@ function App() {
                 }}
                 disabled={page === 1}
               />
-              <Text size="md">Page {page} of {totalPages}</Text>
+              <Text size="md">
+                Page {page} of {totalPages}
+              </Text>
               <IconButton
                 aria-label="Go forward"
                 icon={<ChevronRightIcon />}
@@ -211,7 +224,7 @@ function App() {
         )}
       </Stack>
       <Box>Schedule</Box>
-    </Flex>
+    </HStack>
   );
 }
 
