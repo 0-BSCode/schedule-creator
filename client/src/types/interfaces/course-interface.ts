@@ -1,5 +1,6 @@
 interface CourseInterface {
   code: string;
+  group: number;
   description: string;
   status: string;
   professors: string[];

@@ -16,17 +16,16 @@ app.get("/", (req: Request, res: Response) => {
 
 type CoursesPayloadInterface = {
   course: string;
-  academicPeriod: AcademicPeriodEnum;
+  period: AcademicPeriodEnum;
   year: number;
   page: number;
 };
 
 app.post("/courses", async (req: Request, res: Response) => {
-  const { course, academicPeriod, year, page }: CoursesPayloadInterface =
-    req.body;
+  const { course, period, year, page }: CoursesPayloadInterface = req.body;
   const data = new URLSearchParams({
     Courses: course,
-    AcademicPeriod: academicPeriod,
+    AcademicPeriod: period,
     AcademicYear: year.toString(),
     page: page.toString(),
   });

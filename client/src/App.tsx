@@ -1,56 +1,217 @@
 import { useState } from "react";
 import "./App.css";
-import axios from "axios";
 import AcademicPeriodEnum from "./types/enums/academic-period-enum";
+import {
+  Box,
+  Button,
+  Flex,
+  HStack,
+  IconButton,
+  Input,
+  Select,
+  Stack,
+  Text,
+} from "@chakra-ui/react";
+import NumberInput from "./components/NumberInput";
+import { FormControl, FormLabel } from "@chakra-ui/react";
+import useCourse, { PayloadInterface } from "./hooks/useCourse";
+import {
+  Table,
+  Thead,
+  Tbody,
+  Tr,
+  Th,
+  Td,
+  TableContainer,
+} from "@chakra-ui/react";
+import { ChevronLeftIcon, ChevronRightIcon } from "@chakra-ui/icons";
+
+const getCurrentYear = (): number => {
+  return new Date().getFullYear();
+};
+
+const academicPeriodLabelToEnum = {
+  "First semester": AcademicPeriodEnum.FIRST_SEMESTER,
+  "Second semester": AcademicPeriodEnum.SECOND_SEMESTER,
+  Summer: AcademicPeriodEnum.SUMMER,
+};
+
+enum PageDirectionEnum {
+  BACK,
+  FORWARD,
+}
 
 function App() {
   const [course, setCourse] = useState("");
   const [year, setYear] = useState(2023);
+  const [period, setPeriod] = useState(AcademicPeriodEnum.FIRST_SEMESTER);
+  const [page, setPage] = useState(1);
+  const { courses, totalPages, getCourses } = useCourse();
 
   async function handleFetch(
-    e: React.FormEvent<HTMLButtonElement>
+    e?: React.FormEvent<HTMLButtonElement>,
+    pageNum?: number
   ): Promise<void> {
-    e.preventDefault();
-    const payload = {
+    let pageNumber = pageNum ?? page;
+    // Reset whenever submit button is clicked
+    if (e) {
+      e.preventDefault();
+      pageNumber = 1;
+      setPage(1);
+    }
+    const payload: PayloadInterface = {
       course,
-      academicPeriod: AcademicPeriodEnum.SECOND_SEMESTER,
+      period,
       year,
-      page: 1,
+      page: pageNumber,
     };
-    const res = await axios.post("http://localhost:3000/courses", payload);
-    console.log(res.data);
+    getCourses(payload);
   }
 
   function handleCourseChange(e: React.ChangeEvent<HTMLInputElement>): void {
     setCourse(e.target.value);
   }
 
-  function handleYearChange(e: React.ChangeEvent<HTMLInputElement>): void {
-    setYear(parseInt(e.target.value));
+  function handlePeriodChange(e: React.ChangeEvent<HTMLSelectElement>): void {
+    setPeriod(
+      AcademicPeriodEnum[
+        e.target.value as unknown as keyof typeof AcademicPeriodEnum
+      ]
+    );
+  }
+
+  function handleYearChange(_yearAsString: string, yearAsNumber: number): void {
+    setYear(yearAsNumber);
+  }
+
+  function handlePageChange(direction: PageDirectionEnum): void {
+    const change = direction === PageDirectionEnum.FORWARD ? 1 : -1;
+    if (page + change > 0) {
+      handleFetch(undefined, page + change);
+      setPage(page + change);
+    }
   }
 
   return (
-    <>
-      <form>
-        <label htmlFor="courseName">Course</label>
-        <input
-          id="courseName"
-          type="text"
-          value={course}
-          onChange={handleCourseChange}
-        />
-        <label htmlFor="academicYear">Year</label>
-        <input
-          id="academicYear"
-          type="number"
-          value={year}
-          onChange={handleYearChange}
-        />
-        <button type="submit" onClick={handleFetch}>
-          Search
-        </button>
-      </form>
-    </>
+    <Flex>
+      <Box w="20%">Sidebar</Box>
+      <Stack p={3} maxW={"50%"}>
+        <HStack spacing={6} alignItems={"center"}>
+          <FormControl>
+            <FormLabel>Course Code</FormLabel>
+            <Input
+              placeholder="CIS 2106"
+              value={course}
+              onChange={handleCourseChange}
+            />
+          </FormControl>
+          <FormControl>
+            <FormLabel>Academic Period</FormLabel>
+            <Select value={period} onChange={handlePeriodChange}>
+              {Object.keys(academicPeriodLabelToEnum).map((label) => (
+                <option
+                  key={label}
+                  value={
+                    academicPeriodLabelToEnum[
+                      label as keyof typeof academicPeriodLabelToEnum
+                    ]
+                  }
+                >
+                  {label}
+                </option>
+              ))}
+            </Select>
+          </FormControl>
+          <FormControl>
+            <FormLabel>Academic Year</FormLabel>
+            <NumberInput
+              value={year}
+              onChange={handleYearChange}
+              max={getCurrentYear()}
+              min={2017}
+              defaultValue={getCurrentYear()}
+            />
+          </FormControl>
+        </HStack>
+        <Button onClick={handleFetch}>Search</Button>
+        {courses.length === 0 ? (
+          <Text fontSize={"md"} textAlign={'center'} color="gray">Search first to see the data.</Text>
+        ) : (
+          <Box pt={3}>
+            <TableContainer
+              maxH={"20rem"}
+              style={{
+                overflow: "auto",
+              }}
+            >
+              <Table variant="striped" size="sm">
+                <Thead>
+                  <Tr>
+                    <Th></Th>
+                    <Th>Code</Th>
+                    <Th>Description</Th>
+                    <Th>Status</Th>
+                    <Th>Professor/s</Th>
+                    <Th>Schedule</Th>
+                    <Th>Department Reserved</Th>
+                    <Th>Enrolled Students</Th>
+                  </Tr>
+                </Thead>
+                <Tbody>
+                  {courses.map((course, idx) => (
+                    <Tr key={`course-${idx}`}>
+                      <Td>
+                        <Button colorScheme="green">Add</Button>
+                      </Td>
+                      <Td>{`${course.code} - ${course.group}`}</Td>
+                      <Td>{course.description}</Td>
+                      <Td>{course.status}</Td>
+                      <Td>
+                        {course.professors.map((prof, pIdx) => (
+                          <Text size={"md"} key={`course-${idx}-prof-${pIdx}`}>
+                            {prof}
+                          </Text>
+                        ))}
+                      </Td>
+                      <Td>
+                        {course.schedule.map((sched, sIdx) => (
+                          <Text size={"md"} key={`course-${idx}-sched-${sIdx}`}>
+                            {sched}
+                          </Text>
+                        ))}{" "}
+                      </Td>
+                      <Td>{course.departmentReserved}</Td>
+                      <Td>
+                        {`${course.enrolledStudents}/${course.totalStudents}`}
+                      </Td>
+                    </Tr>
+                  ))}
+                </Tbody>
+              </Table>
+            </TableContainer>
+            <HStack pt={3} justifyContent={"center"} gap={2}>
+              <IconButton
+                aria-label="Go back"
+                icon={<ChevronLeftIcon />}
+                onClick={(e) => {
+                  handlePageChange(PageDirectionEnum.BACK);
+                }}
+                disabled={page === 1}
+              />
+              <Text size="md">Page {page} of {totalPages}</Text>
+              <IconButton
+                aria-label="Go forward"
+                icon={<ChevronRightIcon />}
+                onClick={(e) => {
+                  handlePageChange(PageDirectionEnum.FORWARD);
+                }}
+              />
+            </HStack>
+          </Box>
+        )}
+      </Stack>
+      <Box>Schedule</Box>
+    </Flex>
   );
 }
 
