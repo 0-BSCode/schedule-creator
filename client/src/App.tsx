@@ -6,6 +6,7 @@ import {
   Button,
   Flex,
   HStack,
+  IconButton,
   Input,
   Select,
   Stack,
@@ -23,6 +24,7 @@ import {
   Td,
   TableContainer,
 } from "@chakra-ui/react";
+import { ChevronLeftIcon, ChevronRightIcon } from "@chakra-ui/icons";
 
 const getCurrentYear = (): number => {
   return new Date().getFullYear();
@@ -34,26 +36,30 @@ const academicPeriodLabelToEnum = {
   Summer: AcademicPeriodEnum.SUMMER,
 };
 
+enum PageDirectionEnum {
+  BACK,
+  FORWARD,
+}
+
 function App() {
   const [course, setCourse] = useState("");
   const [year, setYear] = useState(2023);
   const [period, setPeriod] = useState(AcademicPeriodEnum.FIRST_SEMESTER);
   const [page, setPage] = useState(1);
-  const [data, setData] = useState("");
   const { courses, getCourses } = useCourse();
 
   async function handleFetch(
-    e: React.FormEvent<HTMLButtonElement>
+    e?: React.FormEvent<HTMLButtonElement>,
+    pageNum?: number
   ): Promise<void> {
-    e.preventDefault();
+    e?.preventDefault();
     const payload: PayloadInterface = {
       course,
       period,
       year,
-      page,
+      page: pageNum ?? page,
     };
-    const courses = getCourses(payload);
-    setData(JSON.stringify(courses));
+    getCourses(payload);
   }
 
   function handleCourseChange(e: React.ChangeEvent<HTMLInputElement>): void {
@@ -72,7 +78,14 @@ function App() {
     setYear(yearAsNumber);
   }
 
-  console.log(courses);
+  function handlePageChange(direction: PageDirectionEnum): void {
+    const change = direction === PageDirectionEnum.FORWARD ? 1 : -1;
+    if (page + change > 0) {
+      handleFetch(undefined, page + change);
+      setPage(page + change);
+    }
+  }
+
   return (
     <Flex>
       <Box w="20%">Sidebar</Box>
@@ -115,60 +128,83 @@ function App() {
           </FormControl>
         </HStack>
         <Button onClick={handleFetch}>Search</Button>
-        <Box pt={3}>
-          <TableContainer
-            style={{
-              overflowX: "auto",
-            }}
-          >
-            <Table variant="striped" size="sm">
-              <Thead>
-                <Tr>
-                  <Th></Th>
-                  <Th>Code</Th>
-                  <Th>Description</Th>
-                  <Th>Status</Th>
-                  <Th>Professor/s</Th>
-                  <Th>Schedule</Th>
-                  <Th>Department Reserved</Th>
-                  <Th>Enrolled Students</Th>
-                </Tr>
-              </Thead>
-              <Tbody>
-                {courses.map((course, idx) => (
-                  <Tr key={`course-${idx}`}>
-                    <Td>
-                      <Button colorScheme="green">Add</Button>
-                    </Td>
-                    <Td>{`${course.code} - ${course.group}`}</Td>
-                    <Td>{course.description}</Td>
-                    <Td>{course.status}</Td>
-                    <Td>
-                      {course.professors.map((prof, pIdx) => (
-                        <Text size={"md"} key={`course-${idx}-prof-${pIdx}`}>
-                          {prof}
-                        </Text>
-                      ))}
-                    </Td>
-                    <Td>
-                      {course.schedule.map((sched, sIdx) => (
-                        <Text size={"md"} key={`course-${idx}-sched-${sIdx}`}>
-                          {sched}
-                        </Text>
-                      ))}{" "}
-                    </Td>
-                    <Td>{course.departmentReserved}</Td>
-                    <Td>
-                      {`${course.enrolledStudents}/${course.totalStudents}`}
-                    </Td>
+        {courses.length === 0 ? (
+          <Text fontSize={"md"} textAlign={'center'} color="gray">Search first to see the data.</Text>
+        ) : (
+          <Box pt={3}>
+            <TableContainer
+              maxH={"20rem"}
+              style={{
+                overflow: "auto",
+              }}
+            >
+              <Table variant="striped" size="sm">
+                <Thead>
+                  <Tr>
+                    <Th></Th>
+                    <Th>Code</Th>
+                    <Th>Description</Th>
+                    <Th>Status</Th>
+                    <Th>Professor/s</Th>
+                    <Th>Schedule</Th>
+                    <Th>Department Reserved</Th>
+                    <Th>Enrolled Students</Th>
                   </Tr>
-                ))}
-              </Tbody>
-            </Table>
-          </TableContainer>
-        </Box>
+                </Thead>
+                <Tbody>
+                  {courses.map((course, idx) => (
+                    <Tr key={`course-${idx}`}>
+                      <Td>
+                        <Button colorScheme="green">Add</Button>
+                      </Td>
+                      <Td>{`${course.code} - ${course.group}`}</Td>
+                      <Td>{course.description}</Td>
+                      <Td>{course.status}</Td>
+                      <Td>
+                        {course.professors.map((prof, pIdx) => (
+                          <Text size={"md"} key={`course-${idx}-prof-${pIdx}`}>
+                            {prof}
+                          </Text>
+                        ))}
+                      </Td>
+                      <Td>
+                        {course.schedule.map((sched, sIdx) => (
+                          <Text size={"md"} key={`course-${idx}-sched-${sIdx}`}>
+                            {sched}
+                          </Text>
+                        ))}{" "}
+                      </Td>
+                      <Td>{course.departmentReserved}</Td>
+                      <Td>
+                        {`${course.enrolledStudents}/${course.totalStudents}`}
+                      </Td>
+                    </Tr>
+                  ))}
+                </Tbody>
+              </Table>
+            </TableContainer>
+            <HStack pt={3} justifyContent={"center"} gap={2}>
+              <IconButton
+                aria-label="Go back"
+                icon={<ChevronLeftIcon />}
+                onClick={(e) => {
+                  handlePageChange(PageDirectionEnum.BACK);
+                }}
+                disabled={page === 1}
+              />
+              <Text size="md">Page {page}</Text>
+              <IconButton
+                aria-label="Go forward"
+                icon={<ChevronRightIcon />}
+                onClick={(e) => {
+                  handlePageChange(PageDirectionEnum.FORWARD);
+                }}
+              />
+            </HStack>
+          </Box>
+        )}
       </Stack>
-      <Box w="35rem">Schedule</Box>
+      <Box>Schedule</Box>
     </Flex>
   );
 }

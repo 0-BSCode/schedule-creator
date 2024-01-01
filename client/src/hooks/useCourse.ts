@@ -33,6 +33,7 @@ interface UseCourseHookInterface {
 
 const useCourse = (): UseCourseHookInterface => {
   const [courses, setCourses] = useState<CourseInterface[]>([]);
+  const [pageNum, setPageNum] = useState(1);
 
   const getCourses = async (
     payload: PayloadInterface
