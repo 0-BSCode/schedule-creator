@@ -53,6 +53,7 @@ function App() {
     pageNum?: number
   ): Promise<void> {
     let pageNumber = pageNum ?? page;
+    // Reset whenever submit button is clicked
     if (e) {
       e.preventDefault();
       pageNumber = 1;
