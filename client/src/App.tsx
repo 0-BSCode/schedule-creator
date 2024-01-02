@@ -142,7 +142,7 @@ function App() {
   return (
     <HStack alignItems={"flex-start"} h="100vh">
       <Stack p={3} maxW={"50%"} h={"100%"} gap={4}>
-        <Heading as="h1" size="md" textAlign="center">
+        <Heading as="h1" size="lg" textAlign="center">
           Offered Courses
         </Heading>
         <Stack>

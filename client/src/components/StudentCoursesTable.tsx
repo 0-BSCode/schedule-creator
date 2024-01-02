@@ -49,7 +49,7 @@ const StudentCoursesTable = () => {
   return (
     <>
       <Stack>
-        <Heading as="h1" size="md" textAlign="center">
+        <Heading as="h1" size="lg" textAlign="center">
           Course List
         </Heading>
         <HStack>
@@ -80,59 +80,65 @@ const StudentCoursesTable = () => {
           </Tooltip>
         </HStack>
       </Stack>
-      <TableContainer
-        style={{
-          overflow: "auto",
-        }}
-      >
-        <Table variant="striped" size="sm">
-          <Thead>
-            <Tr>
-              <Th></Th>
-              <Th>Code</Th>
-              <Th>Schedule</Th>
-              <Th>Professor/s</Th>
-              <Th>Enrolled Students</Th>
-            </Tr>
-          </Thead>
-          <Tbody>
-            {studentCourses.map((course, idx) => (
-              <Tr key={`course-${idx}`}>
-                <Td>
-                  <IconButton
-                    aria-label="Remove course"
-                    icon={<DeleteIcon />}
-                    colorScheme="red"
-                    onClick={() => {
-                      handleDelete(course);
-                    }}
-                  />
-                </Td>
-                <Td>
-                  <Tooltip label={course.description}>
-                    {`${course.code} - G${course.group}`}
-                  </Tooltip>
-                </Td>
-                <Td>
-                  {course.schedule.map((sched, sIdx) => (
-                    <Text size={"md"} key={`course-${idx}-sched-${sIdx}`}>
-                      {sched}
-                    </Text>
-                  ))}{" "}
-                </Td>
-                <Td>
-                  {course.professors.map((prof, pIdx) => (
-                    <Text size={"md"} key={`course-${idx}-prof-${pIdx}`}>
-                      {prof}
-                    </Text>
-                  ))}
-                </Td>
-                <Td>{`${course.enrolledStudents}/${course.totalStudents}`}</Td>
+      {!studentCourses.length ? (
+        <Text fontSize={"md"} textAlign={"center"} color="gray">
+          No courses add yet.
+        </Text>
+      ) : (
+        <TableContainer
+          style={{
+            overflow: "auto",
+          }}
+        >
+          <Table variant="striped" size="sm">
+            <Thead>
+              <Tr>
+                <Th></Th>
+                <Th>Code</Th>
+                <Th>Schedule</Th>
+                <Th>Professor/s</Th>
+                <Th>Enrolled Students</Th>
               </Tr>
-            ))}
-          </Tbody>
-        </Table>
-      </TableContainer>
+            </Thead>
+            <Tbody>
+              {studentCourses.map((course, idx) => (
+                <Tr key={`course-${idx}`}>
+                  <Td>
+                    <IconButton
+                      aria-label="Remove course"
+                      icon={<DeleteIcon />}
+                      colorScheme="red"
+                      onClick={() => {
+                        handleDelete(course);
+                      }}
+                    />
+                  </Td>
+                  <Td>
+                    <Tooltip label={course.description}>
+                      {`${course.code} - G${course.group}`}
+                    </Tooltip>
+                  </Td>
+                  <Td>
+                    {course.schedule.map((sched, sIdx) => (
+                      <Text size={"md"} key={`course-${idx}-sched-${sIdx}`}>
+                        {sched}
+                      </Text>
+                    ))}{" "}
+                  </Td>
+                  <Td>
+                    {course.professors.map((prof, pIdx) => (
+                      <Text size={"md"} key={`course-${idx}-prof-${pIdx}`}>
+                        {prof}
+                      </Text>
+                    ))}
+                  </Td>
+                  <Td>{`${course.enrolledStudents}/${course.totalStudents}`}</Td>
+                </Tr>
+              ))}
+            </Tbody>
+          </Table>
+        </TableContainer>
+      )}
     </>
   );
 };
