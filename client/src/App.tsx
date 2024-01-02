@@ -14,7 +14,6 @@ import {
 } from "@chakra-ui/react";
 import NumberInput from "./components/NumberInput";
 import { FormControl, FormLabel } from "@chakra-ui/react";
-import useCourse from "./hooks/useCourse";
 import {
   Table,
   Thead,
@@ -25,9 +24,9 @@ import {
   TableContainer,
 } from "@chakra-ui/react";
 import { AddIcon, ChevronLeftIcon, ChevronRightIcon } from "@chakra-ui/icons";
-import { UserCoursesContext } from "./context/userCoursesContext";
+import { CoursesContext, SearchParamsI } from "./context/CoursesContext";
 import StudentCoursesTable from "./components/StudentCoursesTable";
-import CourseInterface from "./types/interfaces/course-interface";
+import CourseI from "./types/interfaces/course-interface";
 import useScheduleHelper from "./hooks/useScheduleHelper";
 import currentSemInfo from "./constants/current-sem-info";
 
@@ -50,13 +49,6 @@ const academicPeriodLabelToEnum = {
     AcademicPeriodEnum.SENIORHIGH_TRANSITION_SEMESTER_2,
 };
 
-export interface SearchParamsI {
-  course: string;
-  period: AcademicPeriodEnum;
-  year: number;
-  page: number;
-}
-
 function App() {
   const [searchParams, setSearchParams] = useState<SearchParamsI>({
     course: "",
@@ -67,25 +59,19 @@ function App() {
   // Only changed on search and helps keep track of the current academic period
   const [staticSearchParams, setStaticSearchParams] =
     useState<SearchParamsI>(searchParams);
-  const { courses, totalPages, getCourses } = useCourse();
   const { isCourseClashing } = useScheduleHelper();
-  const { courses: studentCourses, setCourses } =
-    useContext(UserCoursesContext);
+  const {
+    studentCourses,
+    setStudentCourses,
+    offeredCoursesInfo,
+    setOfferedCoursesInfo,
+  } = useContext(CoursesContext);
 
-  // TODO: Fix spaghetti code
-  async function handleFetch(
-    e?: React.FormEvent<HTMLButtonElement>,
-    pageNum?: number
-  ): Promise<void> {
+  async function handleFetch(pageNumber: number): Promise<void> {
     setStaticSearchParams(searchParams);
-    let pageNumber = pageNum ?? searchParams.page;
-    // Reset whenever submit button is clicked
-    if (e) {
-      pageNumber = 1;
-      setSearchParams({ ...searchParams, page: 1 });
-    }
+    setSearchParams({ ...searchParams, page: pageNumber });
     const payload: SearchParamsI = { ...searchParams, page: pageNumber };
-    getCourses(payload);
+    setOfferedCoursesInfo(payload);
   }
 
   function handleCourseChange(e: React.ChangeEvent<HTMLInputElement>): void {
@@ -108,7 +94,7 @@ function App() {
 
   function handlePageChange(newPage: number): void {
     if (newPage > 0) {
-      handleFetch(undefined, newPage);
+      handleFetch(newPage);
       setSearchParams({ ...searchParams, page: newPage });
     }
   }
@@ -121,13 +107,13 @@ function App() {
   }
 
   // TODO: Save to local storage
-  function addCourse(course: CourseInterface): void {
-    setCourses([...studentCourses, course]);
+  function addCourse(course: CourseI): void {
+    setStudentCourses([...studentCourses, course]);
   }
 
   function getButtonTooltipMessage(
-    course: CourseInterface,
-    studentCourses: CourseInterface[]
+    course: CourseI,
+    studentCourses: CourseI[]
   ): string | null {
     if (course.enrolledStudents === course.totalStudents) {
       return "No more slots available";
@@ -190,9 +176,15 @@ function App() {
               />
             </FormControl>
           </HStack>
-          <Button onClick={handleFetch}>Search</Button>
+          <Button
+            onClick={() => {
+              handleFetch(1);
+            }}
+          >
+            Search
+          </Button>
         </Stack>
-        {courses.length === 0 ? (
+        {offeredCoursesInfo.courses.length === 0 ? (
           <Text fontSize={"md"} textAlign={"center"} color="gray">
             Search first to see the data.
           </Text>
@@ -217,7 +209,7 @@ function App() {
                   </Tr>
                 </Thead>
                 <Tbody>
-                  {courses.map((course, idx) => (
+                  {offeredCoursesInfo.courses.map((course, idx) => (
                     <Tr key={`course-${idx}`}>
                       <Td>
                         <Tooltip
@@ -284,7 +276,7 @@ function App() {
                 isDisabled={searchParams.page === 1}
               />
               <Text size="md">
-                Page {searchParams.page} of {totalPages}
+                Page {searchParams.page} of {offeredCoursesInfo.totalPages}
               </Text>
               <IconButton
                 aria-label="Go forward"
@@ -292,7 +284,7 @@ function App() {
                 onClick={() => {
                   handlePageChange(searchParams.page + 1);
                 }}
-                isDisabled={searchParams.page === totalPages}
+                isDisabled={searchParams.page === offeredCoursesInfo.totalPages}
               />
             </HStack>
           </Box>

@@ -1,6 +1,6 @@
 import DayEnum from "@src/types/enums/day-enum";
-import CourseInterface from "@src/types/interfaces/course-interface";
-import ScheduleInterface from "@src/types/interfaces/schedule-interface";
+import CourseI from "@src/types/interfaces/course-interface";
+import ScheduleI from "@src/types/interfaces/schedule-interface";
 
 interface TimeInterface {
   hour: number;
@@ -9,15 +9,12 @@ interface TimeInterface {
 }
 
 interface ScheduleHelperHookInterface {
-  isCourseClashing: (
-    course: CourseInterface,
-    courseList: CourseInterface[]
-  ) => boolean;
+  isCourseClashing: (course: CourseI, courseList: CourseI[]) => boolean;
 }
 
 const useScheduleHelper = (): ScheduleHelperHookInterface => {
-  const parseSchedule = (course: CourseInterface): ScheduleInterface[] => {
-    const schedules: ScheduleInterface[] = [];
+  const parseSchedule = (course: CourseI): ScheduleI[] => {
+    const schedules: ScheduleI[] = [];
 
     for (const sched of course.schedule) {
       const schedSplit = sched.split(" ");
@@ -85,8 +82,8 @@ const useScheduleHelper = (): ScheduleHelperHookInterface => {
   };
 
   const isCourseClashing = (
-    course: CourseInterface,
-    courseList: CourseInterface[]
+    course: CourseI,
+    courseList: CourseI[]
   ): boolean => {
     const cScheds = parseSchedule(course);
     for (const cSched of cScheds) {

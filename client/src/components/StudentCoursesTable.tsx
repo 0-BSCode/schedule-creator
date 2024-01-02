@@ -11,19 +11,20 @@ import {
   Tooltip,
   Text,
 } from "@chakra-ui/react";
-import { UserCoursesContext } from "@src/context/userCoursesContext";
-import CourseInterface from "@src/types/interfaces/course-interface";
+import { CoursesContext } from "@src/context/CoursesContext";
+import CourseI from "@src/types/interfaces/course-interface";
 import { useContext } from "react";
 
+// TODO; Figure out what to pass into React.FC when component has no props
 // eslint-disable-next-line @typescript-eslint/ban-types
 const StudentCoursesTable = () => {
-  const { courses, setCourses } = useContext(UserCoursesContext);
+  const { studentCourses, setStudentCourses } = useContext(CoursesContext);
 
-  function deleteCourse(course: CourseInterface): void {
-    const filteredCourses = courses.filter(
+  function deleteCourse(course: CourseI): void {
+    const filteredCourses = studentCourses.filter(
       (c) => c.code !== course.code || c.group !== course.group
     );
-    setCourses(filteredCourses);
+    setStudentCourses(filteredCourses);
   }
 
   return (
@@ -43,7 +44,7 @@ const StudentCoursesTable = () => {
           </Tr>
         </Thead>
         <Tbody>
-          {courses.map((course, idx) => (
+          {studentCourses.map((course, idx) => (
             <Tr key={`course-${idx}`}>
               <Td>
                 <IconButton
