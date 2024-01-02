@@ -59,6 +59,7 @@ function App() {
   // Only changed on search and helps keep track of the current academic period
   const [staticSearchParams, setStaticSearchParams] =
     useState<SearchParamsI>(searchParams);
+  const [isFetching, setIsFetching] = useState(false);
   const { isCourseClashing } = useScheduleHelper();
   const {
     studentCourses,
@@ -68,10 +69,12 @@ function App() {
   } = useContext(CoursesContext);
 
   async function handleFetch(pageNumber: number): Promise<void> {
+    setIsFetching(true);
     setStaticSearchParams(searchParams);
     setSearchParams({ ...searchParams, page: pageNumber });
     const payload: SearchParamsI = { ...searchParams, page: pageNumber };
-    setOfferedCoursesInfo(payload);
+    await setOfferedCoursesInfo(payload);
+    setIsFetching(false);
   }
 
   function handleCourseChange(e: React.ChangeEvent<HTMLInputElement>): void {
@@ -140,7 +143,7 @@ function App() {
       <Stack p={3} maxW={"50%"} h={"100%"}>
         <Stack>
           <HStack spacing={6} alignItems={"center"}>
-            <FormControl>
+            <FormControl isReadOnly={isFetching}>
               <FormLabel>Course Code</FormLabel>
               <Input
                 placeholder="CIS 2106"
@@ -148,7 +151,7 @@ function App() {
                 onChange={handleCourseChange}
               />
             </FormControl>
-            <FormControl>
+            <FormControl isReadOnly={isFetching}>
               <FormLabel>Academic Period</FormLabel>
               <Select value={searchParams.period} onChange={handlePeriodChange}>
                 {Object.keys(academicPeriodLabelToEnum).map((label) => (
@@ -165,7 +168,7 @@ function App() {
                 ))}
               </Select>
             </FormControl>
-            <FormControl>
+            <FormControl isReadOnly={isFetching}>
               <FormLabel>Academic Year</FormLabel>
               <NumberInput
                 value={searchParams.year}
@@ -177,6 +180,7 @@ function App() {
             </FormControl>
           </HStack>
           <Button
+            isLoading={isFetching}
             onClick={() => {
               handleFetch(1);
             }}
@@ -184,7 +188,7 @@ function App() {
             Search
           </Button>
         </Stack>
-        {offeredCoursesInfo.courses.length === 0 ? (
+        {!offeredCoursesInfo.courses.length ? (
           <Text fontSize={"md"} textAlign={"center"} color="gray">
             Search first to see the data.
           </Text>
@@ -194,6 +198,7 @@ function App() {
               maxH={"25rem"}
               style={{
                 overflow: "auto",
+                opacity: isFetching ? "50%" : "100%",
               }}
             >
               <Table variant="striped" size="sm">
@@ -226,6 +231,7 @@ function App() {
                               addCourse(course);
                             }}
                             isDisabled={
+                              isFetching ||
                               course.enrolledStudents ===
                                 course.totalStudents ||
                               !!studentCourses.filter(
@@ -273,7 +279,7 @@ function App() {
                 onClick={() => {
                   handlePageChange(searchParams.page - 1);
                 }}
-                isDisabled={searchParams.page === 1}
+                isDisabled={isFetching || searchParams.page === 1}
               />
               <Text size="md">
                 Page {searchParams.page} of {offeredCoursesInfo.totalPages}
@@ -284,7 +290,10 @@ function App() {
                 onClick={() => {
                   handlePageChange(searchParams.page + 1);
                 }}
-                isDisabled={searchParams.page === offeredCoursesInfo.totalPages}
+                isDisabled={
+                  isFetching ||
+                  searchParams.page === offeredCoursesInfo.totalPages
+                }
               />
             </HStack>
           </Box>
