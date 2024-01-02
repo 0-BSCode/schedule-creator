@@ -67,18 +67,11 @@ function App() {
     setOfferedCoursesInfo,
   } = useContext(CoursesContext);
 
-  // TODO: Fix spaghetti code
   async function handleFetch(
-    e?: React.FormEvent<HTMLButtonElement>,
-    pageNum?: number
+    pageNumber: number
   ): Promise<void> {
     setStaticSearchParams(searchParams);
-    let pageNumber = pageNum ?? searchParams.page;
-    // Reset whenever submit button is clicked
-    if (e) {
-      pageNumber = 1;
-      setSearchParams({ ...searchParams, page: 1 });
-    }
+    setSearchParams({ ...searchParams, page: pageNumber });
     const payload: SearchParamsI = { ...searchParams, page: pageNumber };
     setOfferedCoursesInfo(payload);
   }
@@ -103,7 +96,7 @@ function App() {
 
   function handlePageChange(newPage: number): void {
     if (newPage > 0) {
-      handleFetch(undefined, newPage);
+      handleFetch(newPage);
       setSearchParams({ ...searchParams, page: newPage });
     }
   }
@@ -185,7 +178,7 @@ function App() {
               />
             </FormControl>
           </HStack>
-          <Button onClick={handleFetch}>Search</Button>
+          <Button onClick={() => {handleFetch(1)}}>Search</Button>
         </Stack>
         {offeredCoursesInfo.courses.length === 0 ? (
           <Text fontSize={"md"} textAlign={"center"} color="gray">
