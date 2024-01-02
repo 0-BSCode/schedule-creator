@@ -105,6 +105,26 @@ function App() {
     setCourses([...studentCourses, course]);
   }
 
+  function getButtonTooltipMessage(
+    course: CourseInterface,
+    studentCourses: CourseInterface[]
+  ): string | null {
+    if (course.enrolledStudents === course.totalStudents) {
+      return "No more slots available.";
+    }
+
+    if (studentCourses.filter((sc) => sc.code === course.code).length) {
+      return "Course is already in your list.";
+    }
+
+    // TODO: Specify which course it clashes with
+    if (isCourseClashing(course, studentCourses)) {
+      return "Course schedule clashes with course in your list.";
+    }
+
+    return null;
+  }
+
   return (
     <HStack alignItems={"flex-start"} h="100vh">
       <Stack p={3} maxW={"50%"} h={"100%"}>
@@ -176,21 +196,29 @@ function App() {
                   {courses.map((course, idx) => (
                     <Tr key={`course-${idx}`}>
                       <Td>
-                        <IconButton
-                          aria-label="Add course"
-                          icon={<AddIcon />}
-                          colorScheme="green"
-                          onClick={() => {
-                            addCourse(course);
-                          }}
-                          isDisabled={
-                            course.enrolledStudents === course.totalStudents ||
-                            !!studentCourses.filter(
-                              (sc) => sc.code === course.code
-                            ).length ||
-                            isCourseClashing(course, studentCourses)
-                          }
-                        />
+                        <Tooltip
+                          label={getButtonTooltipMessage(
+                            course,
+                            studentCourses
+                          )}
+                        >
+                          <IconButton
+                            aria-label="Add course"
+                            icon={<AddIcon />}
+                            colorScheme="green"
+                            onClick={() => {
+                              addCourse(course);
+                            }}
+                            isDisabled={
+                              course.enrolledStudents ===
+                                course.totalStudents ||
+                              !!studentCourses.filter(
+                                (sc) => sc.code === course.code
+                              ).length ||
+                              isCourseClashing(course, studentCourses)
+                            }
+                          />
+                        </Tooltip>
                       </Td>
                       <Td>
                         <Tooltip label={course.description}>
