@@ -103,7 +103,6 @@ const useScheduleHelper = (): ScheduleHelperHookInterface => {
           const clSchedTimeStart = generateDate(parseTime(clSchedTimes[0]));
           const clSchedTimeEnd = generateDate(parseTime(clSchedTimes[1]));
 
-          // TODO: Fix bug (weird bc same time works on MW's but not TTh's)
           if (
             cSched.day === clSched.day &&
             ((clSchedTimeStart < cSchedTimeEnd &&
