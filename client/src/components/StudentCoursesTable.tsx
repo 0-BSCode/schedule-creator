@@ -12,14 +12,15 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { CoursesContext } from "@src/context/CoursesContext";
-import CourseInterface from "@src/types/interfaces/course-interface";
+import CourseI from "@src/types/interfaces/course-interface";
 import { useContext } from "react";
 
+// TODO; Figure out what to pass into React.FC when component has no props
 // eslint-disable-next-line @typescript-eslint/ban-types
 const StudentCoursesTable = () => {
   const { studentCourses, setStudentCourses } = useContext(CoursesContext);
 
-  function deleteCourse(course: CourseInterface): void {
+  function deleteCourse(course: CourseI): void {
     const filteredCourses = studentCourses.filter(
       (c) => c.code !== course.code || c.group !== course.group
     );

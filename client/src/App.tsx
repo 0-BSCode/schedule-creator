@@ -26,7 +26,7 @@ import {
 import { AddIcon, ChevronLeftIcon, ChevronRightIcon } from "@chakra-ui/icons";
 import { CoursesContext, SearchParamsI } from "./context/CoursesContext";
 import StudentCoursesTable from "./components/StudentCoursesTable";
-import CourseInterface from "./types/interfaces/course-interface";
+import CourseI from "./types/interfaces/course-interface";
 import useScheduleHelper from "./hooks/useScheduleHelper";
 import currentSemInfo from "./constants/current-sem-info";
 
@@ -67,9 +67,7 @@ function App() {
     setOfferedCoursesInfo,
   } = useContext(CoursesContext);
 
-  async function handleFetch(
-    pageNumber: number
-  ): Promise<void> {
+  async function handleFetch(pageNumber: number): Promise<void> {
     setStaticSearchParams(searchParams);
     setSearchParams({ ...searchParams, page: pageNumber });
     const payload: SearchParamsI = { ...searchParams, page: pageNumber };
@@ -109,13 +107,13 @@ function App() {
   }
 
   // TODO: Save to local storage
-  function addCourse(course: CourseInterface): void {
+  function addCourse(course: CourseI): void {
     setStudentCourses([...studentCourses, course]);
   }
 
   function getButtonTooltipMessage(
-    course: CourseInterface,
-    studentCourses: CourseInterface[]
+    course: CourseI,
+    studentCourses: CourseI[]
   ): string | null {
     if (course.enrolledStudents === course.totalStudents) {
       return "No more slots available";
@@ -178,7 +176,13 @@ function App() {
               />
             </FormControl>
           </HStack>
-          <Button onClick={() => {handleFetch(1)}}>Search</Button>
+          <Button
+            onClick={() => {
+              handleFetch(1);
+            }}
+          >
+            Search
+          </Button>
         </Stack>
         {offeredCoursesInfo.courses.length === 0 ? (
           <Text fontSize={"md"} textAlign={"center"} color="gray">

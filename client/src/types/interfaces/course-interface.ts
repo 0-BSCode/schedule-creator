@@ -1,4 +1,4 @@
-interface CourseInterface {
+interface CourseI {
   code: string;
   group: number;
   description: string;
@@ -10,4 +10,4 @@ interface CourseInterface {
   totalStudents: number;
 }
 
-export default CourseInterface;
+export default CourseI;

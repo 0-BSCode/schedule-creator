@@ -1,5 +1,5 @@
 import AcademicPeriodEnum from "@src/types/enums/academic-period-enum";
-import CourseInterface from "@src/types/interfaces/course-interface";
+import CourseI from "@src/types/interfaces/course-interface";
 import axios from "axios";
 import { createContext, useState } from "react";
 
@@ -27,14 +27,14 @@ interface ResponseI {
 }
 
 interface OfferedCoursesInfoI {
-  courses: CourseInterface[];
+  courses: CourseI[];
   totalPages: number;
 }
 export interface CoursesContextI {
   offeredCoursesInfo: OfferedCoursesInfoI;
   setOfferedCoursesInfo: (searchParams: SearchParamsI) => Promise<void>;
-  studentCourses: CourseInterface[];
-  setStudentCourses: (newCourses: CourseInterface[]) => void;
+  studentCourses: CourseI[];
+  setStudentCourses: (newCourses: CourseI[]) => void;
 }
 
 const defaultValues: CoursesContextI = {
@@ -52,7 +52,7 @@ export const CoursesProvider: React.FC<{ children: JSX.Element }> = ({
   const [offeredCoursesInfo, setOfferedCourses] = useState<OfferedCoursesInfoI>(
     defaultValues.offeredCoursesInfo
   );
-  const [studentCourses, setStudentCourses] = useState<CourseInterface[]>([]);
+  const [studentCourses, setStudentCourses] = useState<CourseI[]>([]);
 
   const fetchCourses = async (payload: SearchParamsI): Promise<ResponseI> => {
     const res = await axios.post("http://localhost:3000/courses", payload);
@@ -61,7 +61,7 @@ export const CoursesProvider: React.FC<{ children: JSX.Element }> = ({
   };
 
   const parseData = (rawData: ResponseI): OfferedCoursesInfoI => {
-    const courseData: CourseInterface[] = rawData.courses.map((course) => {
+    const courseData: CourseI[] = rawData.courses.map((course) => {
       const studentInfo = course.enrolledStudents.split("/");
       const courseInfo = course.code.split(" - ");
       const scheduleInfo = course.schedule.split("\n");
