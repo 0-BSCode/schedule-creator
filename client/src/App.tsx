@@ -36,9 +36,18 @@ const getCurrentYear = (): number => {
 };
 
 const academicPeriodLabelToEnum = {
-  "First semester": AcademicPeriodEnum.FIRST_SEMESTER,
-  "Second semester": AcademicPeriodEnum.SECOND_SEMESTER,
+  None: AcademicPeriodEnum.NONE,
+  "1ST Semester": AcademicPeriodEnum.FIRST_SEMESTER,
+  "2ND Semester": AcademicPeriodEnum.SECOND_SEMESTER,
   Summer: AcademicPeriodEnum.SUMMER,
+  "1ST Trimester": AcademicPeriodEnum.FIRST_TRIMESTER,
+  "2ND Trimester": AcademicPeriodEnum.SECOND_SEMESTER,
+  "3RD Trimester": AcademicPeriodEnum.THIRD_TRIMESTER,
+  "Transition Term": AcademicPeriodEnum.TRANSITION_SEMESTER,
+  "Senior High - Transition Semester 1":
+    AcademicPeriodEnum.SENIORHIGH_TRANSITION_SEMESTER_1,
+  "Senior High - Transition Semester 2":
+    AcademicPeriodEnum.SENIORHIGH_TRANSITION_SEMESTER_2,
 };
 
 export interface SearchParamsI {
