@@ -5,6 +5,7 @@ import {
   Box,
   Button,
   HStack,
+  Heading,
   IconButton,
   Input,
   Select,
@@ -118,6 +119,10 @@ function App() {
     course: CourseI,
     studentCourses: CourseI[]
   ): string | null {
+    if (!isCurrentSem()) {
+      return "Can only add courses offered this semester";
+    }
+
     if (course.enrolledStudents === course.totalStudents) {
       return "No more slots available";
     }
@@ -126,13 +131,10 @@ function App() {
       return "Course is already in your list";
     }
 
-    // TODO: Specify which course it clashes with
-    if (isCourseClashing(course, studentCourses)) {
-      return "Course schedule clashes with course in your list";
-    }
-
-    if (!isCurrentSem()) {
-      return "Can only add courses offered this semester";
+    const idx = isCourseClashing(course, studentCourses);
+    if (idx !== -1) {
+      const c = studentCourses[idx];
+      return `Schedule clashes with course ${c.code} - G${c.group} in your list`;
     }
 
     return null;
@@ -140,7 +142,10 @@ function App() {
 
   return (
     <HStack alignItems={"flex-start"} h="100vh">
-      <Stack p={3} maxW={"50%"} h={"100%"}>
+      <Stack p={3} maxW={"50%"} h={"100%"} gap={4}>
+        <Heading as="h1" size="lg" textAlign="center">
+          Offered Courses
+        </Heading>
         <Stack>
           <HStack spacing={6} alignItems={"center"}>
             <FormControl isReadOnly={isFetching}>
@@ -237,7 +242,7 @@ function App() {
                               !!studentCourses.filter(
                                 (sc) => sc.code === course.code
                               ).length ||
-                              isCourseClashing(course, studentCourses) ||
+                              isCourseClashing(course, studentCourses) !== -1 ||
                               !isCurrentSem()
                             }
                           />
@@ -299,7 +304,9 @@ function App() {
           </Box>
         )}
       </Stack>
-      <StudentCoursesTable />
+      <Stack p={3} w={"49%"} h={"100%"} gap={4}>
+        <StudentCoursesTable />
+      </Stack>
     </HStack>
   );
 }

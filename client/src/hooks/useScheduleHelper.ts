@@ -9,9 +9,10 @@ interface TimeInterface {
 }
 
 interface ScheduleHelperHookInterface {
-  isCourseClashing: (course: CourseI, courseList: CourseI[]) => boolean;
+  isCourseClashing: (course: CourseI, courseList: CourseI[]) => number;
 }
 
+// TODO: Refactor (only one exposed function, so hook isn't really necessary)
 const useScheduleHelper = (): ScheduleHelperHookInterface => {
   const parseSchedule = (course: CourseI): ScheduleI[] => {
     const schedules: ScheduleI[] = [];
@@ -81,10 +82,7 @@ const useScheduleHelper = (): ScheduleHelperHookInterface => {
     );
   };
 
-  const isCourseClashing = (
-    course: CourseI,
-    courseList: CourseI[]
-  ): boolean => {
+  const isCourseClashing = (course: CourseI, courseList: CourseI[]): number => {
     const cScheds = parseSchedule(course);
     for (const cSched of cScheds) {
       const cSchedTimes = cSched.time.split(" - ");
@@ -92,7 +90,9 @@ const useScheduleHelper = (): ScheduleHelperHookInterface => {
       const cSchedTimeStart = generateDate(parseTime(cSchedTimes[0]));
       const cSchedTimeEnd = generateDate(parseTime(cSchedTimes[1]));
 
-      for (const cl of courseList) {
+      let idx;
+      for (idx = 0; idx < courseList.length; idx++) {
+        const cl = courseList[idx];
         const clScheds = parseSchedule(cl);
         for (const clSched of clScheds) {
           const clSchedTimes = clSched.time.split(" - ");
@@ -111,13 +111,13 @@ const useScheduleHelper = (): ScheduleHelperHookInterface => {
               (cSchedTimeStart < clSchedTimeStart &&
                 cSchedTimeEnd > clSchedTimeEnd))
           ) {
-            return true;
+            return idx;
           }
         }
       }
     }
 
-    return false;
+    return -1;
   };
 
   return {
