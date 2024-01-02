@@ -55,6 +55,7 @@ const StudentCoursesTable = () => {
         <HStack>
           <Tooltip label="Clear all courses in the list">
             <Button
+              isDisabled={!studentCourses.length}
               leftIcon={<CloseIcon />}
               variant="outline"
               colorScheme="red"
@@ -67,6 +68,7 @@ const StudentCoursesTable = () => {
           </Tooltip>
           <Tooltip label="Export course list information to a text file">
             <Button
+              isDisabled={!studentCourses.length}
               leftIcon={<DownloadIcon />}
               colorScheme="green"
               onClick={() => {
