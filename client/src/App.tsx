@@ -25,7 +25,7 @@ import {
   TableContainer,
 } from "@chakra-ui/react";
 import { AddIcon, ChevronLeftIcon, ChevronRightIcon } from "@chakra-ui/icons";
-import { UserCoursesContext } from "./context/userCoursesContext";
+import { CoursesContext } from "./context/CoursesContext";
 import StudentCoursesTable from "./components/StudentCoursesTable";
 import CourseInterface from "./types/interfaces/course-interface";
 import useScheduleHelper from "./hooks/useScheduleHelper";
@@ -69,8 +69,7 @@ function App() {
     useState<SearchParamsI>(searchParams);
   const { courses, totalPages, getCourses } = useCourse();
   const { isCourseClashing } = useScheduleHelper();
-  const { courses: studentCourses, setCourses } =
-    useContext(UserCoursesContext);
+  const { studentCourses, setStudentCourses } = useContext(CoursesContext);
 
   // TODO: Fix spaghetti code
   async function handleFetch(
@@ -122,7 +121,7 @@ function App() {
 
   // TODO: Save to local storage
   function addCourse(course: CourseInterface): void {
-    setCourses([...studentCourses, course]);
+    setStudentCourses([...studentCourses, course]);
   }
 
   function getButtonTooltipMessage(
