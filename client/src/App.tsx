@@ -55,6 +55,7 @@ function App() {
   const { courses: studentCourses, setCourses } =
     useContext(UserCoursesContext);
 
+  // TODO: Fix spaghetti code
   async function handleFetch(
     e?: React.FormEvent<HTMLButtonElement>,
     pageNum?: number
@@ -99,6 +100,7 @@ function App() {
     }
   }
 
+  // TODO: Save to local storage
   function addCourse(course: CourseInterface): void {
     setCourses([...studentCourses, course]);
   }

@@ -2,6 +2,12 @@ import DayEnum from "@src/types/enums/day-enum";
 import CourseInterface from "@src/types/interfaces/course-interface";
 import ScheduleInterface from "@src/types/interfaces/schedule-interface";
 
+interface TimeInterface {
+  hour: number;
+  minute: number;
+  meridian: number;
+}
+
 interface ScheduleHelperHookInterface {
   isCourseClashing: (
     course: CourseInterface,
@@ -48,23 +54,33 @@ const useScheduleHelper = (): ScheduleHelperHookInterface => {
     return schedules;
   };
 
-  const generateDate = (
-    hour: number,
-    minute: number,
-    meridian: number
-  ): Date => {
+  // Sample input => 12:00 PM (string)
+  const parseTime = (timeInfo: string): TimeInterface => {
+    const timeInfoSplit = timeInfo.split(":");
+    const hour = parseInt(timeInfoSplit[0]);
+    const minute = parseInt(timeInfoSplit[1]);
+    const meridian = timeInfo.includes("PM") && hour !== 12 ? 12 : 0;
+
+    return {
+      hour,
+      minute,
+      meridian,
+    };
+  };
+
+  const generateDate = ({ hour, minute, meridian }: TimeInterface): Date => {
     const YEAR = 2023; // Year doesn't matter for time comparison
     const MONTH = 0; // Month doesn't matter for time comparison
     const DAY = 1; // Day doesn't matter for time comparison
+    const HOUR = hour + meridian;
 
     return new Date(
       // Assuming time format is "HH:mm AM/PM"
       YEAR,
       MONTH,
       DAY,
-      hour, // Hour
-      minute, // Minute
-      meridian // Adjust for AM/PM
+      HOUR, // Hour
+      minute // Minute
     );
   };
 
@@ -73,43 +89,19 @@ const useScheduleHelper = (): ScheduleHelperHookInterface => {
     courseList: CourseInterface[]
   ): boolean => {
     const cScheds = parseSchedule(course);
-    console.log(`Comparing ${course.code} - G${course.group}`);
     for (const cSched of cScheds) {
-      console.log("Sched: ", cSched);
       const cSchedTimes = cSched.time.split(" - ");
 
-      const cSchedTimeStart = generateDate(
-        parseInt(cSchedTimes[0].split(":")[0]),
-        parseInt(cSchedTimes[0].split(":")[1]),
-        cSchedTimes[0].includes("PM") ? 12 : 0
-      );
-      const cSchedTimeEnd = generateDate(
-        parseInt(cSchedTimes[1].split(":")[0]),
-        parseInt(cSchedTimes[1].split(":")[1]),
-        cSchedTimes[1].includes("PM") ? 12 : 0
-      );
-      console.log("Start: ", cSchedTimeStart.toString());
-      console.log("End: ", cSchedTimeEnd.toString());
+      const cSchedTimeStart = generateDate(parseTime(cSchedTimes[0]));
+      const cSchedTimeEnd = generateDate(parseTime(cSchedTimes[1]));
 
       for (const cl of courseList) {
-        console.log(`with ${cl.code} - G${cl.group}`);
         const clScheds = parseSchedule(cl);
         for (const clSched of clScheds) {
-          console.log("Sched: ", clSched);
           const clSchedTimes = clSched.time.split(" - ");
 
-          const clSchedTimeStart = generateDate(
-            parseInt(clSchedTimes[0].split(":")[0]),
-            parseInt(clSchedTimes[0].split(":")[1]),
-            clSchedTimes[0].includes("PM") ? 12 : 0
-          );
-          const clSchedTimeEnd = generateDate(
-            parseInt(clSchedTimes[1].split(":")[0]),
-            parseInt(clSchedTimes[1].split(":")[1]),
-            clSchedTimes[1].includes("PM") ? 12 : 0
-          );
-          console.log("Start: ", clSchedTimeStart.toString());
-          console.log("End: ", clSchedTimeEnd.toString());
+          const clSchedTimeStart = generateDate(parseTime(clSchedTimes[0]));
+          const clSchedTimeEnd = generateDate(parseTime(clSchedTimes[1]));
 
           // TODO: Fix bug (weird bc same time works on MW's but not TTh's)
           if (
@@ -123,7 +115,33 @@ const useScheduleHelper = (): ScheduleHelperHookInterface => {
               (cSchedTimeStart < clSchedTimeStart &&
                 cSchedTimeEnd > clSchedTimeEnd))
           ) {
-            console.log("OVERLAPS");
+            const cSchedObj = {
+              course: `${course.code} - G${course.group}`,
+              info: cSched,
+              start: {
+                number: cSchedTimeStart.getTime(),
+                string: cSchedTimeStart.toLocaleTimeString(),
+              },
+              end: {
+                number: cSchedTimeEnd.getTime(),
+                string: cSchedTimeEnd.toLocaleTimeString(),
+              },
+            };
+            const clSchedObj = {
+              course: `${cl.code} - G${cl.group}`,
+              info: clSched,
+              start: {
+                number: clSchedTimeStart.getTime(),
+                string: clSchedTimeStart.toLocaleTimeString(),
+              },
+              end: {
+                number: clSchedTimeEnd.getTime(),
+                string: clSchedTimeEnd.toLocaleTimeString(),
+              },
+            };
+            console.log("OVERLAPPING");
+            console.log(cSchedObj);
+            console.log(clSchedObj);
             return true;
           }
         }

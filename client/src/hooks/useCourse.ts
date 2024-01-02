@@ -32,6 +32,7 @@ interface UseCourseHookInterface {
   getCourses: (payload: PayloadInterface) => Promise<CourseInterface[]>;
 }
 
+// TODO: Fix spaghetti
 const useCourse = (): UseCourseHookInterface => {
   const [courses, setCourses] = useState<CourseInterface[]>([]);
   const [totalPages, setTotalPages] = useState(1);
