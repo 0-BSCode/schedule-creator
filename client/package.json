@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
+    "start": "npm run build && cd dist && http-server -p 5173",
     "dev-lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "lint": "eslint src/**/*{.ts,.tsx} --fix",
     "prettier": "prettier --write ./src/**/*{.ts,.tsx}",
@@ -19,6 +20,7 @@
     "@emotion/styled": "^11.11.0",
     "axios": "^1.6.3",
     "framer-motion": "^10.16.16",
+    "http-server": "^14.1.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
