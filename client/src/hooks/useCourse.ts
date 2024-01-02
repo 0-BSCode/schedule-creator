@@ -1,4 +1,4 @@
-import AcademicPeriodEnum from "@src/types/enums/academic-period-enum";
+import { SearchParamsI } from "@src/App";
 import CourseInterface from "@src/types/interfaces/course-interface";
 import axios from "axios";
 import { useState } from "react";
@@ -19,17 +19,10 @@ interface ResponseInterface {
   totalPages: number;
 }
 
-export interface PayloadInterface {
-  course: string;
-  period: AcademicPeriodEnum;
-  year: number;
-  page: number;
-}
-
 interface UseCourseHookInterface {
   courses: CourseInterface[];
   totalPages: number;
-  getCourses: (payload: PayloadInterface) => Promise<CourseInterface[]>;
+  getCourses: (payload: SearchParamsI) => Promise<CourseInterface[]>;
 }
 
 // TODO: Fix spaghetti
@@ -38,7 +31,7 @@ const useCourse = (): UseCourseHookInterface => {
   const [totalPages, setTotalPages] = useState(1);
 
   const getCourses = async (
-    payload: PayloadInterface
+    payload: SearchParamsI
   ): Promise<CourseInterface[]> => {
     const data = await fetchCourses(payload);
     setTotalPages(data.totalPages);
@@ -48,7 +41,7 @@ const useCourse = (): UseCourseHookInterface => {
   };
 
   const fetchCourses = async (
-    payload: PayloadInterface
+    payload: SearchParamsI
   ): Promise<ResponseInterface> => {
     const res = await axios.post("http://localhost:3000/courses", payload);
     const data = res.data as ResponseInterface;
