@@ -1,16 +1,16 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import "./App.css";
 import AcademicPeriodEnum from "./types/enums/academic-period-enum";
 import {
   Box,
   Button,
-  Flex,
   HStack,
   IconButton,
   Input,
   Select,
   Stack,
   Text,
+  Tooltip,
 } from "@chakra-ui/react";
 import NumberInput from "./components/NumberInput";
 import { FormControl, FormLabel } from "@chakra-ui/react";
@@ -24,7 +24,11 @@ import {
   Td,
   TableContainer,
 } from "@chakra-ui/react";
-import { ChevronLeftIcon, ChevronRightIcon } from "@chakra-ui/icons";
+import { AddIcon, ChevronLeftIcon, ChevronRightIcon } from "@chakra-ui/icons";
+import { UserCoursesContext } from "./context/userCoursesContext";
+import StudentCoursesTable from "./components/StudentCoursesTable";
+import CourseInterface from "./types/interfaces/course-interface";
+import useScheduleHelper from "./hooks/useScheduleHelper";
 
 const getCurrentYear = (): number => {
   return new Date().getFullYear();
@@ -47,7 +51,11 @@ function App() {
   const [period, setPeriod] = useState(AcademicPeriodEnum.FIRST_SEMESTER);
   const [page, setPage] = useState(1);
   const { courses, totalPages, getCourses } = useCourse();
+  const { isCourseClashing } = useScheduleHelper();
+  const { courses: studentCourses, setCourses } =
+    useContext(UserCoursesContext);
 
+  // TODO: Fix spaghetti code
   async function handleFetch(
     e?: React.FormEvent<HTMLButtonElement>,
     pageNum?: number
@@ -92,54 +100,82 @@ function App() {
     }
   }
 
+  // TODO: Save to local storage
+  function addCourse(course: CourseInterface): void {
+    setCourses([...studentCourses, course]);
+  }
+
+  function getButtonTooltipMessage(
+    course: CourseInterface,
+    studentCourses: CourseInterface[]
+  ): string | null {
+    if (course.enrolledStudents === course.totalStudents) {
+      return "No more slots available.";
+    }
+
+    if (studentCourses.filter((sc) => sc.code === course.code).length) {
+      return "Course is already in your list.";
+    }
+
+    // TODO: Specify which course it clashes with
+    if (isCourseClashing(course, studentCourses)) {
+      return "Course schedule clashes with course in your list.";
+    }
+
+    return null;
+  }
+
   return (
-    <Flex>
-      <Box w="20%">Sidebar</Box>
-      <Stack p={3} maxW={"50%"}>
-        <HStack spacing={6} alignItems={"center"}>
-          <FormControl>
-            <FormLabel>Course Code</FormLabel>
-            <Input
-              placeholder="CIS 2106"
-              value={course}
-              onChange={handleCourseChange}
-            />
-          </FormControl>
-          <FormControl>
-            <FormLabel>Academic Period</FormLabel>
-            <Select value={period} onChange={handlePeriodChange}>
-              {Object.keys(academicPeriodLabelToEnum).map((label) => (
-                <option
-                  key={label}
-                  value={
-                    academicPeriodLabelToEnum[
-                      label as keyof typeof academicPeriodLabelToEnum
-                    ]
-                  }
-                >
-                  {label}
-                </option>
-              ))}
-            </Select>
-          </FormControl>
-          <FormControl>
-            <FormLabel>Academic Year</FormLabel>
-            <NumberInput
-              value={year}
-              onChange={handleYearChange}
-              max={getCurrentYear()}
-              min={2017}
-              defaultValue={getCurrentYear()}
-            />
-          </FormControl>
-        </HStack>
-        <Button onClick={handleFetch}>Search</Button>
+    <HStack alignItems={"flex-start"} h="100vh">
+      <Stack p={3} maxW={"50%"} h={"100%"}>
+        <Stack>
+          <HStack spacing={6} alignItems={"center"}>
+            <FormControl>
+              <FormLabel>Course Code</FormLabel>
+              <Input
+                placeholder="CIS 2106"
+                value={course}
+                onChange={handleCourseChange}
+              />
+            </FormControl>
+            <FormControl>
+              <FormLabel>Academic Period</FormLabel>
+              <Select value={period} onChange={handlePeriodChange}>
+                {Object.keys(academicPeriodLabelToEnum).map((label) => (
+                  <option
+                    key={label}
+                    value={
+                      academicPeriodLabelToEnum[
+                        label as keyof typeof academicPeriodLabelToEnum
+                      ]
+                    }
+                  >
+                    {label}
+                  </option>
+                ))}
+              </Select>
+            </FormControl>
+            <FormControl>
+              <FormLabel>Academic Year</FormLabel>
+              <NumberInput
+                value={year}
+                onChange={handleYearChange}
+                max={getCurrentYear()}
+                min={2017}
+                defaultValue={getCurrentYear()}
+              />
+            </FormControl>
+          </HStack>
+          <Button onClick={handleFetch}>Search</Button>
+        </Stack>
         {courses.length === 0 ? (
-          <Text fontSize={"md"} textAlign={'center'} color="gray">Search first to see the data.</Text>
+          <Text fontSize={"md"} textAlign={"center"} color="gray">
+            Search first to see the data.
+          </Text>
         ) : (
           <Box pt={3}>
             <TableContainer
-              maxH={"20rem"}
+              maxH={"25rem"}
               style={{
                 overflow: "auto",
               }}
@@ -149,7 +185,6 @@ function App() {
                   <Tr>
                     <Th></Th>
                     <Th>Code</Th>
-                    <Th>Description</Th>
                     <Th>Status</Th>
                     <Th>Professor/s</Th>
                     <Th>Schedule</Th>
@@ -161,10 +196,35 @@ function App() {
                   {courses.map((course, idx) => (
                     <Tr key={`course-${idx}`}>
                       <Td>
-                        <Button colorScheme="green">Add</Button>
+                        <Tooltip
+                          label={getButtonTooltipMessage(
+                            course,
+                            studentCourses
+                          )}
+                        >
+                          <IconButton
+                            aria-label="Add course"
+                            icon={<AddIcon />}
+                            colorScheme="green"
+                            onClick={() => {
+                              addCourse(course);
+                            }}
+                            isDisabled={
+                              course.enrolledStudents ===
+                                course.totalStudents ||
+                              !!studentCourses.filter(
+                                (sc) => sc.code === course.code
+                              ).length ||
+                              isCourseClashing(course, studentCourses)
+                            }
+                          />
+                        </Tooltip>
                       </Td>
-                      <Td>{`${course.code} - ${course.group}`}</Td>
-                      <Td>{course.description}</Td>
+                      <Td>
+                        <Tooltip label={course.description}>
+                          {`${course.code} - G${course.group}`}
+                        </Tooltip>
+                      </Td>
                       <Td>{course.status}</Td>
                       <Td>
                         {course.professors.map((prof, pIdx) => (
@@ -196,9 +256,11 @@ function App() {
                 onClick={(e) => {
                   handlePageChange(PageDirectionEnum.BACK);
                 }}
-                disabled={page === 1}
+                isDisabled={page === 1}
               />
-              <Text size="md">Page {page} of {totalPages}</Text>
+              <Text size="md">
+                Page {page} of {totalPages}
+              </Text>
               <IconButton
                 aria-label="Go forward"
                 icon={<ChevronRightIcon />}
@@ -210,8 +272,8 @@ function App() {
           </Box>
         )}
       </Stack>
-      <Box>Schedule</Box>
-    </Flex>
+      <StudentCoursesTable />
+    </HStack>
   );
 }
 
