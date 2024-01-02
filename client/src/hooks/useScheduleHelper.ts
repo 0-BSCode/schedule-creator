@@ -115,33 +115,6 @@ const useScheduleHelper = (): ScheduleHelperHookInterface => {
               (cSchedTimeStart < clSchedTimeStart &&
                 cSchedTimeEnd > clSchedTimeEnd))
           ) {
-            const cSchedObj = {
-              course: `${course.code} - G${course.group}`,
-              info: cSched,
-              start: {
-                number: cSchedTimeStart.getTime(),
-                string: cSchedTimeStart.toLocaleTimeString(),
-              },
-              end: {
-                number: cSchedTimeEnd.getTime(),
-                string: cSchedTimeEnd.toLocaleTimeString(),
-              },
-            };
-            const clSchedObj = {
-              course: `${cl.code} - G${cl.group}`,
-              info: clSched,
-              start: {
-                number: clSchedTimeStart.getTime(),
-                string: clSchedTimeStart.toLocaleTimeString(),
-              },
-              end: {
-                number: clSchedTimeEnd.getTime(),
-                string: clSchedTimeEnd.toLocaleTimeString(),
-              },
-            };
-            console.log("OVERLAPPING");
-            console.log(cSchedObj);
-            console.log(clSchedObj);
             return true;
           }
         }
