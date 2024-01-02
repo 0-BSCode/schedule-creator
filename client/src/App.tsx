@@ -68,10 +68,10 @@ function App() {
     e?: React.FormEvent<HTMLButtonElement>,
     pageNum?: number
   ): Promise<void> {
+    setStaticSearchParams(searchParams);
     let pageNumber = pageNum ?? searchParams.page;
     // Reset whenever submit button is clicked
     if (e) {
-      // e.preventDefault();
       pageNumber = 1;
       setSearchParams({ ...searchParams, page: 1 });
     }
@@ -106,8 +106,8 @@ function App() {
 
   function isCurrentSem(): boolean {
     return (
-      searchParams.year === currentSemInfo.year &&
-      searchParams.period === currentSemInfo.period
+      staticSearchParams.year === currentSemInfo.year &&
+      staticSearchParams.period === currentSemInfo.period
     );
   }
 
