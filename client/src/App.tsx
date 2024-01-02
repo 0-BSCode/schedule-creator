@@ -131,9 +131,10 @@ function App() {
       return "Course is already in your list";
     }
 
-    // TODO: Specify which course it clashes with
-    if (isCourseClashing(course, studentCourses)) {
-      return "Course schedule clashes with course in your list";
+    const idx = isCourseClashing(course, studentCourses);
+    if (idx !== -1) {
+      const c = studentCourses[idx];
+      return `Schedule clashes with course ${c.code} - G${c.group} in your list`;
     }
 
     return null;
@@ -241,7 +242,7 @@ function App() {
                               !!studentCourses.filter(
                                 (sc) => sc.code === course.code
                               ).length ||
-                              isCourseClashing(course, studentCourses) ||
+                              isCourseClashing(course, studentCourses) !== -1 ||
                               !isCurrentSem()
                             }
                           />
