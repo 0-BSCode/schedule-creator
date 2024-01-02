@@ -283,6 +283,7 @@ function App() {
                 onClick={() => {
                   handlePageChange(searchParams.page + 1);
                 }}
+                isDisabled={searchParams.page === totalPages}
               />
             </HStack>
           </Box>
