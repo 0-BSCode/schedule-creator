@@ -64,7 +64,7 @@ const StudentCoursesTable = () => {
         <Heading as="h1" size="lg" textAlign="center">
           Course List
         </Heading>
-        <HStack>
+        <HStack alignItems={"flex-start"}>
           <Tooltip label="Clear all courses in the list">
             <Button
               isDisabled={!studentCourses.length}
@@ -74,6 +74,7 @@ const StudentCoursesTable = () => {
               onClick={() => {
                 handleDeleteAll();
               }}
+              flex={1}
             >
               Clear
             </Button>
@@ -86,6 +87,7 @@ const StudentCoursesTable = () => {
               onClick={() => {
                 handleExport();
               }}
+              flex={1}
             >
               Export
             </Button>
