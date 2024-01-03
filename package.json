@@ -7,7 +7,10 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "format-client": "cd client && npm run format",
     "format-server": "cd server && npm run format",
-    "format": "npm run format-client && npm run format-server"
+    "format": "npm run format-client && npm run format-server",
+    "setup-client": "cd client && npm install",
+    "setup-server": "cd server && npm install",
+    "setup": "npm run setup-client && npm run setup-server"
   },
   "keywords": [],
   "author": "",
