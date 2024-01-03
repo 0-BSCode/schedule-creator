@@ -6,11 +6,16 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
+    "start": "npm run build && cd dist && http-server -p 5173",
     "dev-lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "lint": "eslint src/**/*{.ts,.tsx} --fix",
     "prettier": "prettier --write ./src/**/*{.ts,.tsx}",
     "format": "npm run lint && npm run prettier",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "docker-build": "docker build -t schedule-creator-client -f Dockerfile .",
+    "docker-run": "docker run -d -p 5173:5173 schedule-creator-client:latest",
+    "docker-push": "docker tag schedule-creator-server:latest bscode/schedule-creator-client:latest && docker push bscode/schedule-creator-client:latest",
+    "docker-publish": "npm run docker-build && npm run docker-push"
   },
   "dependencies": {
     "@chakra-ui/icons": "^2.1.1",
@@ -19,6 +24,7 @@
     "@emotion/styled": "^11.11.0",
     "axios": "^1.6.3",
     "framer-motion": "^10.16.16",
+    "http-server": "^14.1.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },

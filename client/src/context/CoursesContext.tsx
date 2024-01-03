@@ -3,6 +3,7 @@ import CourseI from "@src/types/interfaces/course-interface";
 import axios from "axios";
 import { createContext, useState } from "react";
 
+const SERVER_URL = import.meta.env.VITE_SERVER_URL || "http://localhost:3000";
 export interface SearchParamsI {
   course: string;
   period: AcademicPeriodEnum;
@@ -55,7 +56,7 @@ export const CoursesProvider: React.FC<{ children: JSX.Element }> = ({
   const [studentCourses, setStudentCourses] = useState<CourseI[]>([]);
 
   const fetchCourses = async (payload: SearchParamsI): Promise<ResponseI> => {
-    const res = await axios.post("http://localhost:3000/courses", payload);
+    const res = await axios.post(`${SERVER_URL}/courses`, payload);
     const data = res.data as ResponseI;
     return data;
   };

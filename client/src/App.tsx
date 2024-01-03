@@ -30,6 +30,7 @@ import StudentCoursesTable from "./components/StudentCoursesTable";
 import CourseI from "./types/interfaces/course-interface";
 import useScheduleHelper from "./hooks/useScheduleHelper";
 import currentSemInfo from "./constants/current-sem-info";
+import useToast from "./hooks/useToast";
 
 const getCurrentYear = (): number => {
   return new Date().getFullYear();
@@ -51,6 +52,7 @@ const academicPeriodLabelToEnum = {
 };
 
 function App() {
+  const { error } = useToast();
   const [searchParams, setSearchParams] = useState<SearchParamsI>({
     course: "",
     year: currentSemInfo.year,
@@ -74,8 +76,13 @@ function App() {
     setStaticSearchParams(searchParams);
     setSearchParams({ ...searchParams, page: pageNumber });
     const payload: SearchParamsI = { ...searchParams, page: pageNumber };
-    await setOfferedCoursesInfo(payload);
-    setIsFetching(false);
+    try {
+      await setOfferedCoursesInfo(payload);
+    } catch (e) {
+      error({ title: (e as Error).message });
+    } finally {
+      setIsFetching(false);
+    }
   }
 
   function handleCourseChange(e: React.ChangeEvent<HTMLInputElement>): void {
