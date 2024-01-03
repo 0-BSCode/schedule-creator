@@ -1,3 +1,5 @@
+import dotenv from "dotenv";
+dotenv.config({ path: ".env" });
 import express, { Request, Response } from "express";
 import axios from "axios";
 import { load } from "cheerio";
@@ -5,7 +7,7 @@ import cors from "cors";
 import AcademicPeriodEnum from "./types/enums/academic-period-enum";
 
 const app = express();
-const PORT = 3000; // Or get port from environment variable
+const PORT = process.env.PORT || 3000; // Or get port from environment variable
 
 app.use(express.json());
 app.use(cors());

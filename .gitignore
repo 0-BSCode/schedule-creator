@@ -27,3 +27,4 @@ client/*.sw?
 # * Server
 server/node_modules
 server/dist
+*/.env
