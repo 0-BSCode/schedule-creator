@@ -14,7 +14,7 @@ app.use(express.json());
 app.use(cors());
 
 app.get("/", (req: Request, res: Response) => {
-  res.send("Hi from Express + TypeScript!");
+  return res.sendStatus(200);
 });
 
 type CoursesPayloadInterface = {
