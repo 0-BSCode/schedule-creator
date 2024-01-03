@@ -16,6 +16,7 @@ import {
   Button,
 } from "@chakra-ui/react";
 import { CoursesContext } from "@src/context/CoursesContext";
+import useWindowSize from "@src/hooks/useWindowSize";
 import CourseI from "@src/types/interfaces/course-interface";
 import { useContext } from "react";
 
@@ -33,6 +34,7 @@ const formatCourseInfoForExport = (courses: CourseI[]): CourseExportI[] => {
 // TODO; Figure out what to pass into React.FC when component has no props
 // eslint-disable-next-line @typescript-eslint/ban-types
 const StudentCoursesTable = () => {
+  const { isMobileWidth } = useWindowSize();
   const { studentCourses, setStudentCourses } = useContext(CoursesContext);
 
   function handleDelete(course: CourseI): void {
@@ -64,7 +66,7 @@ const StudentCoursesTable = () => {
         <Heading as="h1" size="lg" textAlign="center">
           Course List
         </Heading>
-        <HStack>
+        <HStack alignItems={"flex-start"}>
           <Tooltip label="Clear all courses in the list">
             <Button
               isDisabled={!studentCourses.length}
@@ -74,6 +76,7 @@ const StudentCoursesTable = () => {
               onClick={() => {
                 handleDeleteAll();
               }}
+              flex={1}
             >
               Clear
             </Button>
@@ -86,6 +89,7 @@ const StudentCoursesTable = () => {
               onClick={() => {
                 handleExport();
               }}
+              flex={1}
             >
               Export
             </Button>

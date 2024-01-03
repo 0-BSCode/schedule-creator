@@ -31,6 +31,7 @@ import CourseI from "./types/interfaces/course-interface";
 import useScheduleHelper from "./hooks/useScheduleHelper";
 import currentSemInfo from "./constants/current-sem-info";
 import useToast from "./hooks/useToast";
+import useWindowSize from "./hooks/useWindowSize";
 
 const getCurrentYear = (): number => {
   return new Date().getFullYear();
@@ -53,6 +54,8 @@ const academicPeriodLabelToEnum = {
 
 function App() {
   const { error } = useToast();
+  const { isCourseClashing } = useScheduleHelper();
+  const { isMobileWidth } = useWindowSize();
   const [searchParams, setSearchParams] = useState<SearchParamsI>({
     course: "",
     year: currentSemInfo.year,
@@ -63,13 +66,14 @@ function App() {
   const [staticSearchParams, setStaticSearchParams] =
     useState<SearchParamsI>(searchParams);
   const [isFetching, setIsFetching] = useState(false);
-  const { isCourseClashing } = useScheduleHelper();
   const {
     studentCourses,
     setStudentCourses,
     offeredCoursesInfo,
     setOfferedCoursesInfo,
   } = useContext(CoursesContext);
+
+  console.log(isMobileWidth);
 
   async function handleFetch(pageNumber: number): Promise<void> {
     setIsFetching(true);
@@ -148,8 +152,12 @@ function App() {
   }
 
   return (
-    <HStack alignItems={"flex-start"} h="100vh">
-      <Stack p={3} maxW={"50%"} h={"100%"} gap={4}>
+    <Stack
+      alignItems={isMobileWidth ? "center" : "flex-start"}
+      h="100vh"
+      direction={isMobileWidth ? "column" : "row"}
+    >
+      <Stack p={3} maxW={isMobileWidth ? "90%" : "50%"} h={"100%"} gap={4}>
         <Heading as="h1" size="lg" textAlign="center">
           Offered Courses
         </Heading>
@@ -311,10 +319,10 @@ function App() {
           </Box>
         )}
       </Stack>
-      <Stack p={3} w={"49%"} h={"100%"} gap={4}>
+      <Stack p={3} w={isMobileWidth ? "90%" : "49%"} h={"100%"} gap={4}>
         <StudentCoursesTable />
       </Stack>
-    </HStack>
+    </Stack>
   );
 }
 
