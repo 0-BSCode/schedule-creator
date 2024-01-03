@@ -64,13 +64,13 @@ export const CoursesProvider: React.FC<{ children: JSX.Element }> = ({
   const parseData = (rawData: ResponseI): OfferedCoursesInfoI => {
     const courseData: CourseI[] = rawData.courses.map((course) => {
       const studentInfo = course.enrolledStudents.split("/");
-      const courseInfo = course.code.split(" - ");
+      const [code, group] = course.code.split(" - ");
       const scheduleInfo = course.schedule.split("\n");
 
       return {
         ...course,
-        code: courseInfo[0],
-        group: parseInt(courseInfo[1][courseInfo[1].length - 1]),
+        code,
+        group: parseInt(group.split(" ")[1]),
         professors: [course.professors],
         schedule: scheduleInfo.map((sched) => sched.trim()),
         enrolledStudents: parseInt(studentInfo[0]),
