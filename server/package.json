@@ -13,7 +13,8 @@
     "docker-build": "docker build -t schedule-creator-server -f Dockerfile .",
     "docker-run": "docker run -d -p 80:3000 schedule-creator-server:latest",
     "docker-push": "docker tag schedule-creator-server:latest bscode/schedule-creator-server:latest && docker push bscode/schedule-creator-server:latest",
-    "docker-publish": "npm run docker-build && npm run docker-push"
+    "docker-publish": "npm run docker-build && npm run docker-push",
+    "vercel-build": "echo hello"
   },
   "keywords": [],
   "author": "",
