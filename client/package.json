@@ -12,7 +12,10 @@
     "prettier": "prettier --write ./src/**/*{.ts,.tsx}",
     "format": "npm run lint && npm run prettier",
     "preview": "vite preview",
-    "dockerize": "docker build -t schedule-creator-client -f Dockerfile ."
+    "docker-build": "docker build -t schedule-creator-client -f Dockerfile .",
+    "docker-run": "docker run -d -p 5173:5173 schedule-creator-client:latest",
+    "docker-push": "docker tag schedule-creator-server:latest bscode/schedule-creator-client:latest && docker push bscode/schedule-creator-client:latest",
+    "docker-publish": "npm run docker-build && npm run docker-push"
   },
   "dependencies": {
     "@chakra-ui/icons": "^2.1.1",

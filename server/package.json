@@ -10,7 +10,10 @@
     "lint": "eslint src/**/*.ts --fix",
     "prettier": "prettier --write src/**/*.ts",
     "format": "npm run lint && npm run prettier",
-    "dockerize": "docker build -t schedule-creator-server -f Dockerfile ."
+    "docker-build": "docker build -t schedule-creator-server -f Dockerfile .",
+    "docker-run": "docker run -d -p 80:3000 schedule-creator-server:latest",
+    "docker-push": "docker tag schedule-creator-server:latest bscode/schedule-creator-server:latest && docker push bscode/schedule-creator-server:latest",
+    "docker-publish": "npm run docker-build && npm run docker-push"
   },
   "keywords": [],
   "author": "",
