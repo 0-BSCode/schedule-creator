@@ -48,7 +48,6 @@ const StudentCoursesTable = () => {
 
   function handleExport(): void {
     const exportData = formatCourseInfoForExport(studentCourses);
-    console.log(exportData);
     const blob = new Blob([JSON.stringify(exportData, null, 2)], {
       type: "application/json",
     });
