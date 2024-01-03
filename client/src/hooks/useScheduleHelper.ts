@@ -2,18 +2,18 @@ import DayEnum from "@src/types/enums/day-enum";
 import CourseI from "@src/types/interfaces/course-interface";
 import ScheduleI from "@src/types/interfaces/schedule-interface";
 
-interface TimeInterface {
+interface TimeI {
   hour: number;
   minute: number;
   meridian: number;
 }
 
-interface ScheduleHelperHookInterface {
+interface ScheduleHelperHookI {
   isCourseClashing: (course: CourseI, courseList: CourseI[]) => number;
 }
 
 // TODO: Refactor (only one exposed function, so hook isn't really necessary)
-const useScheduleHelper = (): ScheduleHelperHookInterface => {
+const useScheduleHelper = (): ScheduleHelperHookI => {
   const parseSchedule = (course: CourseI): ScheduleI[] => {
     const schedules: ScheduleI[] = [];
 
@@ -53,7 +53,7 @@ const useScheduleHelper = (): ScheduleHelperHookInterface => {
   };
 
   // Sample input => 12:00 PM (string)
-  const parseTime = (timeInfo: string): TimeInterface => {
+  const parseTime = (timeInfo: string): TimeI => {
     const timeInfoSplit = timeInfo.split(":");
     const hour = parseInt(timeInfoSplit[0]);
     const minute = parseInt(timeInfoSplit[1]);
@@ -66,7 +66,7 @@ const useScheduleHelper = (): ScheduleHelperHookInterface => {
     };
   };
 
-  const generateDate = ({ hour, minute, meridian }: TimeInterface): Date => {
+  const generateDate = ({ hour, minute, meridian }: TimeI): Date => {
     const YEAR = 2023; // Year doesn't matter for time comparison
     const MONTH = 0; // Month doesn't matter for time comparison
     const DAY = 1; // Day doesn't matter for time comparison
