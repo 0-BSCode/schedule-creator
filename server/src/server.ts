@@ -37,6 +37,9 @@ app.post("/courses", async (req: Request, res: Response) => {
   } catch (e) {
     console.error((e as Error).message);
     console.error((e as Error).stack);
+    return res.status(500).json({
+      message: (e as Error).message,
+    });
   }
 
   return res.json({
