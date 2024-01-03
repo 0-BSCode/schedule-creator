@@ -155,12 +155,16 @@ function App() {
       h="100vh"
       direction={isMobileWidth ? "column" : "row"}
     >
-      <Stack p={3} maxW={isMobileWidth ? "90%" : "50%"} h={"100%"} gap={4}>
+      <Stack p={3} w={isMobileWidth ? "90%" : "50%"} h={"100%"} gap={4}>
         <Heading as="h1" size="lg" textAlign="center">
           Offered Courses
         </Heading>
         <Stack>
-          <HStack spacing={6} alignItems={"center"}>
+          <Stack
+            direction={isMobileWidth ? "column" : "row"}
+            spacing={isMobileWidth ? 2 : 6}
+            alignItems={"stretch"}
+          >
             <FormControl isReadOnly={isFetching}>
               <FormLabel>Course Code</FormLabel>
               <Input
@@ -196,7 +200,7 @@ function App() {
                 defaultValue={getCurrentYear()}
               />
             </FormControl>
-          </HStack>
+          </Stack>
           <Button
             isLoading={isFetching}
             onClick={() => {
