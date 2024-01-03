@@ -73,8 +73,6 @@ function App() {
     setOfferedCoursesInfo,
   } = useContext(CoursesContext);
 
-  console.log(isMobileWidth);
-
   async function handleFetch(pageNumber: number): Promise<void> {
     setIsFetching(true);
     setStaticSearchParams(searchParams);
