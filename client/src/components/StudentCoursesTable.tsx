@@ -19,6 +19,17 @@ import { CoursesContext } from "@src/context/CoursesContext";
 import CourseI from "@src/types/interfaces/course-interface";
 import { useContext } from "react";
 
+interface CourseExportI extends CourseI {
+  course: string;
+}
+
+const formatCourseInfoForExport = (courses: CourseI[]): CourseExportI[] => {
+  const exportData: CourseExportI[] = courses.map((c) => {
+    return { course: `${c.code} - G${c.group}`, ...c };
+  });
+  return exportData;
+};
+
 // TODO; Figure out what to pass into React.FC when component has no props
 // eslint-disable-next-line @typescript-eslint/ban-types
 const StudentCoursesTable = () => {
@@ -36,7 +47,8 @@ const StudentCoursesTable = () => {
   }
 
   function handleExport(): void {
-    const blob = new Blob([JSON.stringify(studentCourses, null, 2)], {
+    const exportData = formatCourseInfoForExport(studentCourses);
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], {
       type: "application/json",
     });
     const link = document.createElement("a");
