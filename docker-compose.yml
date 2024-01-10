@@ -2,38 +2,34 @@ version: '3'
 
 services: 
 
-  server:
+  backend:
     build: 
       context: server
     container_name: schedule-creator-server
     working_dir: /app
     networks: 
       - schedule-creator-app
-    volumes: 
-      - ./server:/app
     tty: true
     ports: 
       - "3000:3000"
     command: npm run start
 
-  client:
+  frontend:
     build: 
       context: client
     container_name: schedule-creator-client
     working_dir: /app
     networks: 
       - schedule-creator-app
-    volumes: 
-      - ./client:/app
     tty: true
     ports: 
       - "5173:5173"
-    command: npm run start
+    command: npm run serve
 
   nginx:
     build: 
       context: nginx
-    container_name: schedule-creator
+    container_name: schedule-creator-nginx
     restart: always
     tty: true
     ports: 
@@ -41,8 +37,8 @@ services:
     networks: 
       - schedule-creator-app
     depends_on:
-       - server
-       - client
+       - backend
+       - frontend
   
 networks: 
   schedule-creator-app:
