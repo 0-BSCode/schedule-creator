@@ -3,7 +3,8 @@ import CourseI from "@src/types/interfaces/course-interface";
 import axios from "axios";
 import { createContext, useState } from "react";
 
-const SERVER_URL = import.meta.env.VITE_SERVER_URL || "http://localhost:3000";
+const SERVER_URL =
+  import.meta.env.VITE_SERVER_URL || "http://localhost:3000/api";
 export interface SearchParamsI {
   course: string;
   period: AcademicPeriodEnum;

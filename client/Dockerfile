@@ -1,4 +1,6 @@
-FROM node:16-alpine
+FROM node:alpine
+
+ARG VITE_SERVER_URL=/api
 
 WORKDIR /app
 
@@ -8,5 +10,3 @@ RUN npm install
 COPY . .
 
 EXPOSE 5173
-
-CMD ["npm", "run", "start"]
