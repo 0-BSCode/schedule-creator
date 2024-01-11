@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "start": "npm run build && cd dist && http-server -p 5173",
+    "serve": "cd dist && http-server -p 5173",
+    "start": "npm run build && cd dist && npm run serve",
     "dev-lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "lint": "eslint src/**/*{.ts,.tsx} --fix",
     "prettier": "prettier --write ./src/**/*{.ts,.tsx}",

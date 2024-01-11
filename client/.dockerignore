@@ -2,3 +2,5 @@ node_modules
 npm-debug.log
 dist
 *.md
+# Rollup optional dependency issue (regenerate this on container bc it's not Windows)
+package-lock.json

@@ -54,3 +54,4 @@ If you have any feedback, please reach out to me at bipsanchez.work@gmail.com
 
 - Import saved schedule
 
+- Container hot reload

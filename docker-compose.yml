@@ -1,0 +1,49 @@
+version: '3'
+
+services: 
+
+  backend:
+    build: 
+      context: server
+    container_name: schedule-creator-server
+    networks: 
+      - schedule-creator-app
+    working_dir: /app
+    tty: true
+    ports: 
+      - "3000:3000"
+    command: npm run start
+
+  frontend:
+    build: 
+      context: client
+    container_name: schedule-creator-client
+    networks: 
+      - schedule-creator-app
+    working_dir: /app
+    tty: true
+    ports: 
+      - "5173:5173"
+    command: npm run serve
+
+  nginx:
+    build: 
+      context: nginx
+    container_name: schedule-creator-nginx
+    restart: always
+    tty: true
+    ports: 
+      - "80:80"
+      - "443:443"
+    networks: 
+      - schedule-creator-app
+    depends_on:
+       - backend
+       - frontend
+    volumes: # Referencing SSL certs generated on server
+       - /etc/letsencrypt/ssl/fullchain.pem:/etc/nginx/ssl/fullchain.pem
+       - /etc/letsencrypt/ssl/privkey.pem:/etc/nginx/ssl/privkey.pem
+
+networks: 
+  schedule-creator-app:
+    driver: bridge
