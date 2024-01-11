@@ -29,20 +29,17 @@ services:
   nginx:
     build: 
       context: nginx
+      dockerfile: Dockerfile.dev
     container_name: schedule-creator-nginx
     restart: always
     tty: true
     ports: 
       - "80:80"
-      - "443:443"
     networks: 
       - schedule-creator-app
     depends_on:
        - backend
        - frontend
-    volumes: # Referencing SSL certs generated on server
-       - /etc/letsencrypt/ssl/fullchain.pem:/etc/nginx/ssl/fullchain.pem
-       - /etc/letsencrypt/ssl/privkey.pem:/etc/nginx/ssl/privkey.pem
 
 networks: 
   schedule-creator-app:
