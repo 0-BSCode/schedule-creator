@@ -11,7 +11,8 @@
     "setup-client": "cd client && npm install",
     "setup-server": "cd server && npm install",
     "setup": "npm run setup-client && npm run setup-server",
-    "dev": "docker-compose -f docker-compose.dev.yml up --build"
+    "dev": "docker-compose -f docker-compose.dev.yml up --build",
+    "prod": "docker-compose up --build"
   },
   "keywords": [],
   "author": "",
