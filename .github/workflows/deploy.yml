@@ -22,6 +22,7 @@ jobs:
                 username: "${{ secrets.EC2_USERNAME }}"
                 key: "${{ secrets.EC2_SSH_KEY }}"
                 script: |
+                  rm -rf schedule-creator
                   git clone https://github.com/0-BSCode/schedule-creator.git
                   cd schedule-creator
                   npm run prod
